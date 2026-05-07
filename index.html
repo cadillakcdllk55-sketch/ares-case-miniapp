@@ -1,176 +1,305 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Ares Case</title>
+    <title>Ares Case</title>
 
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
+
 <body>
-  <div class="app">
+
+<div class="app">
+
+    <!-- TOP HEADER -->
+
     <header class="top-header">
-      <button class="close-btn">× Close</button>
 
-      <div class="balance-bar">
-        <div class="balance-pill">
-          <span>⭐</span>
-          <strong id="starBalance">35</strong>
-          <button>+</button>
+        <div class="live-wrapper">
+            <span class="live-text">LIVE</span>
+
+            <div class="live-items">
+                <span>🎁</span>
+                <span>💎</span>
+                <span>🎂</span>
+                <span>🔥</span>
+                <span>⚔️</span>
+                <span>🧨</span>
+                <span>🎰</span>
+                <span>👑</span>
+                <span>💣</span>
+                <span>🪙</span>
+                <span>🍀</span>
+                <span>🃏</span>
+                <span>🎮</span>
+                <span>💼</span>
+                <span>🚀</span>
+            </div>
         </div>
 
-        <div class="balance-pill">
-          <span>🎟️</span>
-          <strong id="ticketBalance">2</strong>
-          <button>+</button>
+        <div class="balance-area">
+
+            <div class="balance-pill">
+                ⭐ 35
+            </div>
+
+            <div class="balance-pill blue">
+                🎟️ 2
+            </div>
+
         </div>
-      </div>
+
     </header>
 
-    <section class="live-strip">
-      <span class="live-label">LIVE</span>
+    <!-- SCREENS -->
 
-      <div class="live-items" id="liveItems">
-        <span>🎁</span>
-        <span>🧙‍♂️</span>
-        <span>🌙</span>
-        <span>🎂</span>
-        <span>💎</span>
-        <span>🧪</span>
-        <span>🎰</span>
-        <span>🦄</span>
-        <span>🧧</span>
-        <span>🛡️</span>
-        <span>🐉</span>
-        <span>⚔️</span>
-        <span>🎲</span>
-        <span>👑</span>
-        <span>🔥</span>
-      </div>
-    </section>
+    <main class="screens">
 
-    <main class="main-screen">
-      <section class="case-menu">
-        <button class="case-card dark" data-page="Free Case">
-          <div class="case-icon">🎁</div>
+        <!-- HOME -->
 
-          <div>
-            <h3>Free</h3>
-            <p>2 cases</p>
-          </div>
-        </button>
+        <section class="screen active" id="home-screen">
 
-        <button class="case-card blue" data-page="Roulette">
-          <div class="case-icon">⭐</div>
+            <div class="game-list">
 
-          <div>
-            <h3>Roulette</h3>
-            <p>15 cases</p>
-          </div>
-        </button>
+                <div class="game-card gray">
+                    <div class="game-icon">🎁</div>
 
-        <button class="case-card orange" data-page="PvP">
-          <div class="case-icon">⚔️</div>
+                    <div class="game-info">
+                        <h3>Free</h3>
+                        <p>2 cases</p>
+                    </div>
+                </div>
 
-          <div>
-            <h3>PvP</h3>
-            <p>Online</p>
-          </div>
-        </button>
+                <div class="game-card blue">
+                    <div class="game-icon">⭐</div>
 
-        <button class="case-card navy" data-page="Crash">
-          <div class="case-icon">🚀</div>
+                    <div class="game-info">
+                        <h3>Roulette</h3>
+                        <p>15 cases</p>
+                    </div>
+                </div>
 
-          <div>
-            <h3>Crash</h3>
-            <p>Online</p>
-          </div>
-        </button>
+                <div class="game-card orange">
+                    <div class="game-icon">⚔️</div>
 
-        <button class="case-card red" data-page="Slots">
-          <div class="case-icon">🎰</div>
+                    <div class="game-info">
+                        <h3>PvP</h3>
+                        <p>Online</p>
+                    </div>
+                </div>
 
-          <div>
-            <h3>Slots</h3>
-            <p>5 cases</p>
-          </div>
-        </button>
+                <div class="game-card dark">
+                    <div class="game-icon">🚀</div>
 
-        <button class="case-card green" data-page="Eggs">
-          <div class="case-icon">🥚</div>
+                    <div class="game-info">
+                        <h3>Crash</h3>
+                        <p>Online</p>
+                    </div>
+                </div>
 
-          <div>
-            <h3>Eggs</h3>
-            <p>6 cases</p>
-          </div>
-        </button>
+                <div class="game-card red">
+                    <div class="game-icon">🎰</div>
 
-        <button class="case-card purple" data-page="Upgrade">
-          <div class="case-icon">🐸</div>
+                    <div class="game-info">
+                        <h3>Slots</h3>
+                        <p>5 cases</p>
+                    </div>
+                </div>
 
-          <div>
-            <h3>Upgrade</h3>
-            <p>Improve your gifts</p>
-          </div>
-        </button>
+                <div class="game-card green">
+                    <div class="game-icon">🥚</div>
 
-        <button class="about-btn" data-page="About">
-          ℹ️ About the game
-        </button>
-      </section>
+                    <div class="game-info">
+                        <h3>Eggs</h3>
+                        <p>6 cases</p>
+                    </div>
+                </div>
+
+                <div class="game-card purple">
+                    <div class="game-icon">⬆️</div>
+
+                    <div class="game-info">
+                        <h3>Upgrade</h3>
+                        <p>Improve your gifts</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- TASKS -->
+
+        <section class="screen" id="tasks-screen">
+
+            <div class="page-title">
+                Tasks
+            </div>
+
+            <div class="task-list">
+
+                <div class="task-card">
+                    <div>
+                        <h3>Join Telegram Channel</h3>
+                        <p>+500 coins</p>
+                    </div>
+
+                    <button>GO</button>
+                </div>
+
+                <div class="task-card">
+                    <div>
+                        <h3>Invite 3 Friends</h3>
+                        <p>+1500 coins</p>
+                    </div>
+
+                    <button>GO</button>
+                </div>
+
+                <div class="task-card">
+                    <div>
+                        <h3>Daily Login</h3>
+                        <p>+250 coins</p>
+                    </div>
+
+                    <button>CLAIM</button>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- RAFFLES -->
+
+        <section class="screen" id="raffles-screen">
+
+            <div class="page-title">
+                Raffles
+            </div>
+
+            <div class="raffle-card">
+
+                <div class="raffle-top">
+                    <span>🔥 Premium Case</span>
+                    <span>2h left</span>
+                </div>
+
+                <div class="raffle-progress">
+                    <div class="raffle-fill"></div>
+                </div>
+
+                <button class="join-btn">
+                    JOIN NOW
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- LEADERBOARD -->
+
+        <section class="screen" id="leaderboard-screen">
+
+            <div class="page-title">
+                Leaderboard
+            </div>
+
+            <div class="leaderboard-list">
+
+                <div class="leaderboard-item">
+                    <span>#1</span>
+                    <span>areszers</span>
+                    <span>125.000</span>
+                </div>
+
+                <div class="leaderboard-item">
+                    <span>#2</span>
+                    <span>ghost</span>
+                    <span>98.400</span>
+                </div>
+
+                <div class="leaderboard-item">
+                    <span>#3</span>
+                    <span>darkking</span>
+                    <span>77.210</span>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- PROFILE -->
+
+        <section class="screen" id="profile-screen">
+
+            <div class="profile-card">
+
+                <div class="profile-avatar">
+                    A
+                </div>
+
+                <h2>areszers</h2>
+
+                <p>ID: 458291</p>
+
+                <div class="profile-stats">
+
+                    <div class="stat-box">
+                        <h3>35</h3>
+                        <p>Coins</p>
+                    </div>
+
+                    <div class="stat-box">
+                        <h3>12</h3>
+                        <p>Cases</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
     </main>
 
-    <nav class="bottom-nav">
-      <button class="active" data-page="Cases">
-        <span>📦</span>
-        <small>Cases</small>
-      </button>
+    <!-- BOTTOM NAVBAR -->
 
-      <button data-page="Raffles">
-        <span>🎁</span>
-        <small>Raffles</small>
-      </button>
+    <nav class="bottom-navbar">
 
-      <button data-page="Tasks">
-        <span>📋</span>
-        <small>Tasks</small>
-        <b>9</b>
-      </button>
+        <button class="nav-btn active" data-screen="home-screen">
+            <span>🎁</span>
+            <p>Cases</p>
+        </button>
 
-      <button data-page="Leaderboard">
-        <span>🌐</span>
-        <small>Leaderboard</small>
-      </button>
+        <button class="nav-btn" data-screen="raffles-screen">
+            <span>🎟️</span>
+            <p>Raffles</p>
+        </button>
 
-      <button data-page="Profile">
-        <span>👤</span>
-        <small>Profile</small>
-      </button>
+        <button class="nav-btn" data-screen="tasks-screen">
+            <span>📌</span>
+            <p>Tasks</p>
+        </button>
+
+        <button class="nav-btn" data-screen="leaderboard-screen">
+            <span>🌍</span>
+            <p>Top</p>
+        </button>
+
+        <button class="nav-btn" data-screen="profile-screen">
+            <span>👤</span>
+            <p>Profile</p>
+        </button>
+
     </nav>
 
-    <div class="modal hidden" id="dailyModal">
-      <div class="modal-card">
-        <button class="modal-close" id="closeModal">×</button>
+</div>
 
-        <div class="modal-items">
-          <span>🎁</span>
-          <span>🧧</span>
-          <span>🍌</span>
-        </div>
+<script src="app.js"></script>
 
-        <h2>A free daily case is available to you!</h2>
-
-        <p>
-          Cool prizes are waiting inside. Open your daily case before it expires.
-        </p>
-
-        <button class="modal-action" id="goDaily">Go to</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
 </body>
 </html>

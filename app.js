@@ -1,343 +1,454 @@
 const tg = window.Telegram?.WebApp;
 
 if (tg) {
-  tg.ready();
-  tg.expand();
+    tg.ready();
+    tg.expand();
 }
 
 const user = tg?.initDataUnsafe?.user || {
-  id: "local_test",
-  first_name: "Test User",
-  username: "local_user",
-  photo_url: ""
+    id: 458291,
+    first_name: "Ares",
+    username: "areszers"
 };
 
-const caseCards = document.querySelectorAll(".case-card");
-const bottomButtons = document.querySelectorAll(".bottom-nav button");
-
-const modal = document.getElementById("dailyModal");
-const closeModal = document.getElementById("closeModal");
-const goDaily = document.getElementById("goDaily");
-const mainScreen = document.querySelector(".main-screen");
+const navButtons = document.querySelectorAll(".nav-btn");
+const screens = document.querySelectorAll(".screen");
 
 let balance = 35;
 let tickets = 2;
 let inventory = [];
+let currentCaseOpening = false;
 
-document.getElementById("starBalance").textContent = balance;
-document.getElementById("ticketBalance").textContent = tickets;
+/* NAVIGATION */
 
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    modal.classList.remove("hidden");
-  }, 1200);
+navButtons.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+        const target = button.dataset.screen;
+
+        navButtons.forEach((btn) => {
+            btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        screens.forEach((screen) => {
+            screen.classList.remove("active");
+        });
+
+        document.getElementById(target).classList.add("active");
+
+    });
+
 });
 
-closeModal.addEventListener("click", () => {
-  modal.classList.add("hidden");
-});
+/* PROFILE */
 
-goDaily.addEventListener("click", () => {
-  modal.classList.add("hidden");
-  openDailyReward();
-});
+updateProfile();
 
-caseCards.forEach((card) => {
-  card.addEventListener("click", () => {
-    openPage(card.dataset.page);
-  });
-});
+function updateProfile() {
 
-bottomButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    bottomButtons.forEach((btn) => btn.classList.remove("active"));
-    button.classList.add("active");
-    openPage(button.dataset.page);
-  });
-});
+    const profileScreen = document.getElementById("profile-screen");
 
-function openPage(page) {
-  if (page === "Cases") {
-    renderHome();
-    return;
-  }
+    profileScreen.innerHTML = `
 
-  if (page === "Profile") {
-    renderProfile();
-    return;
-  }
+        <div class="profile-card">
 
-  if (page === "Free Case") {
-    openDailyReward();
-    return;
-  }
+            <div class="profile-avatar">
+                ${user.first_name.charAt(0)}
+            </div>
 
-  if (page === "Tasks") {
-    renderTasks();
-    return;
-  }
+            <h2>${user.username}</h2>
 
-  if (page === "Raffles") {
-    renderComingSoon("🎁 Raffles");
-    return;
-  }
+            <p>ID: ${user.id}</p>
 
-  if (page === "Leaderboard") {
-    renderComingSoon("🌐 Leaderboard");
-    return;
-  }
+            <div class="profile-stats">
 
-  renderComingSoon(page);
+                <div class="stat-box">
+                    <h3>${balance}</h3>
+                    <p>Coins</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3>${inventory.length}</h3>
+                    <p>Items</p>
+                </div>
+
+            </div>
+
+            <div class="inventory-section">
+
+                <h3 class="inventory-title">
+                    Inventory
+                </h3>
+
+                <div class="inventory-list">
+
+                    ${
+                        inventory.length === 0
+                        ?
+                        `
+                        <div class="empty-inventory">
+                            No items yet.
+                        </div>
+                        `
+                        :
+                        inventory.map(item => `
+                            <div class="inventory-item">
+
+                                <span>${item.icon}</span>
+
+                                <div>
+                                    <h4>${item.name}</h4>
+                                    <p>${item.rarity}</p>
+                                </div>
+
+                            </div>
+                        `).join("")
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
 }
+
+/* CASE SYSTEM */
+
+const gameCards = document.querySelectorAll(".game-card");
+
+gameCards.forEach((card) => {
+
+    card.addEventListener("click", () => {
+
+        const gameName = card.querySelector("h3").innerText;
+
+        if (gameName === "Free") {
+            openCase("Free Case");
+        }
+
+        else if (gameName === "Roulette") {
+            fakeToast("Roulette system coming soon.");
+        }
+
+        else if (gameName === "PvP") {
+            fakeToast("PvP battles coming soon.");
+        }
+
+        else if (gameName === "Crash") {
+            fakeToast("Crash system coming soon.");
+        }
+
+        else if (gameName === "Slots") {
+            fakeToast("Slots system coming soon.");
+        }
+
+        else if (gameName === "Eggs") {
+            fakeToast("Egg opening system coming soon.");
+        }
+
+        else if (gameName === "Upgrade") {
+            fakeToast("Upgrade system coming soon.");
+        }
+
+    });
+
+});
+
+function openCase(caseName) {
+
+    if (currentCaseOpening) return;
+
+    currentCaseOpening = true;
+
+    const rewards = [
+
+        {
+            icon: "💎",
+            name: "Diamond",
+            rarity: "Legendary"
+        },
+
+        {
+            icon: "🔥",
+            name: "Fire Blade",
+            rarity: "Epic"
+        },
+
+        {
+            icon: "🎟️",
+            name: "Ticket",
+            rarity: "Rare"
+        },
+
+        {
+            icon: "🪙",
+            name: "Golden Coin",
+            rarity: "Common"
+        },
+
+        {
+            icon: "👑",
+            name: "King Crown",
+            rarity: "Mythic"
+        }
+
+    ];
+
+    const reward = rewards[
+        Math.floor(Math.random() * rewards.length)
+    ];
+
+    const homeScreen = document.getElementById("home-screen");
+
+    homeScreen.innerHTML = `
+
+        <div class="case-opening-screen">
+
+            <div class="spinner-area">
+
+                <div class="spinner-track">
+
+                    <div class="spinner-item">💎</div>
+                    <div class="spinner-item">🔥</div>
+                    <div class="spinner-item">🎟️</div>
+                    <div class="spinner-item">👑</div>
+                    <div class="spinner-item">🪙</div>
+                    <div class="spinner-item">💣</div>
+                    <div class="spinner-item">⚔️</div>
+                    <div class="spinner-item">🚀</div>
+
+                </div>
+
+            </div>
+
+            <div class="opening-status">
+                Opening ${caseName}...
+            </div>
+
+        </div>
+
+    `;
+
+    setTimeout(() => {
+
+        inventory.push(reward);
+
+        balance += 5;
+
+        updateBalance();
+        updateProfile();
+
+        homeScreen.innerHTML = `
+
+            <div class="reward-screen">
+
+                <div class="reward-icon">
+                    ${reward.icon}
+                </div>
+
+                <h2>${reward.name}</h2>
+
+                <p>${reward.rarity}</p>
+
+                <button class="claim-btn" id="claimRewardBtn">
+                    CLAIM
+                </button>
+
+            </div>
+
+        `;
+
+        document
+            .getElementById("claimRewardBtn")
+            .addEventListener("click", () => {
+
+                renderHome();
+
+            });
+
+        currentCaseOpening = false;
+
+    }, 3500);
+
+}
+
+/* HOME RENDER */
 
 function renderHome() {
-  mainScreen.innerHTML = `
-    <section class="case-menu">
-      <button class="case-card dark" data-page="Free Case">
-        <div class="case-icon">🎁</div>
-        <div>
-          <h3>Free</h3>
-          <p>2 cases</p>
+
+    const homeScreen = document.getElementById("home-screen");
+
+    homeScreen.innerHTML = `
+
+        <div class="game-list">
+
+            <div class="game-card gray">
+                <div class="game-icon">🎁</div>
+
+                <div class="game-info">
+                    <h3>Free</h3>
+                    <p>2 cases</p>
+                </div>
+            </div>
+
+            <div class="game-card blue">
+                <div class="game-icon">⭐</div>
+
+                <div class="game-info">
+                    <h3>Roulette</h3>
+                    <p>15 cases</p>
+                </div>
+            </div>
+
+            <div class="game-card orange">
+                <div class="game-icon">⚔️</div>
+
+                <div class="game-info">
+                    <h3>PvP</h3>
+                    <p>Online</p>
+                </div>
+            </div>
+
+            <div class="game-card dark">
+                <div class="game-icon">🚀</div>
+
+                <div class="game-info">
+                    <h3>Crash</h3>
+                    <p>Online</p>
+                </div>
+            </div>
+
+            <div class="game-card red">
+                <div class="game-icon">🎰</div>
+
+                <div class="game-info">
+                    <h3>Slots</h3>
+                    <p>5 cases</p>
+                </div>
+            </div>
+
+            <div class="game-card green">
+                <div class="game-icon">🥚</div>
+
+                <div class="game-info">
+                    <h3>Eggs</h3>
+                    <p>6 cases</p>
+                </div>
+            </div>
+
+            <div class="game-card purple">
+                <div class="game-icon">⬆️</div>
+
+                <div class="game-info">
+                    <h3>Upgrade</h3>
+                    <p>Improve your gifts</p>
+                </div>
+            </div>
+
         </div>
-      </button>
 
-      <button class="case-card blue" data-page="Roulette">
-        <div class="case-icon">⭐</div>
-        <div>
-          <h3>Roulette</h3>
-          <p>15 cases</p>
-        </div>
-      </button>
+    `;
 
-      <button class="case-card orange" data-page="PvP">
-        <div class="case-icon">⚔️</div>
-        <div>
-          <h3>PvP</h3>
-          <p>Online</p>
-        </div>
-      </button>
+    reconnectGameCards();
 
-      <button class="case-card navy" data-page="Crash">
-        <div class="case-icon">🚀</div>
-        <div>
-          <h3>Crash</h3>
-          <p>Online</p>
-        </div>
-      </button>
-
-      <button class="case-card red" data-page="Slots">
-        <div class="case-icon">🎰</div>
-        <div>
-          <h3>Slots</h3>
-          <p>5 cases</p>
-        </div>
-      </button>
-
-      <button class="case-card green" data-page="Eggs">
-        <div class="case-icon">🥚</div>
-        <div>
-          <h3>Eggs</h3>
-          <p>6 cases</p>
-        </div>
-      </button>
-
-      <button class="case-card purple" data-page="Upgrade">
-        <div class="case-icon">🐸</div>
-        <div>
-          <h3>Upgrade</h3>
-          <p>Improve your gifts</p>
-        </div>
-      </button>
-
-      <button class="about-btn" data-page="About">
-        ℹ️ About the game
-      </button>
-    </section>
-  `;
-
-  reconnectCaseCards();
 }
 
-function renderProfile() {
-  const username = user.username ? `@${user.username}` : "Kullanıcı adı yok";
-  const photo = user.photo_url || "";
+function reconnectGameCards() {
 
-  mainScreen.innerHTML = `
-    <section class="page-screen">
-      <div class="profile-card">
-        <div class="profile-avatar">
-          ${photo ? `<img src="${photo}" alt="profile" />` : "👤"}
-        </div>
+    const cards = document.querySelectorAll(".game-card");
 
-        <h2>${user.first_name || "Telegram User"}</h2>
-        <p>${username}</p>
+    cards.forEach((card) => {
 
-        <div class="profile-stats">
-          <div>
-            <span>ID</span>
-            <strong>${user.id}</strong>
-          </div>
+        card.addEventListener("click", () => {
 
-          <div>
-            <span>Balance</span>
-            <strong>${balance} ⭐</strong>
-          </div>
+            const gameName = card.querySelector("h3").innerText;
 
-          <div>
-            <span>Tickets</span>
-            <strong>${tickets} 🎟️</strong>
-          </div>
+            if (gameName === "Free") {
+                openCase("Free Case");
+            }
 
-          <div>
-            <span>Inventory</span>
-            <strong>${inventory.length}</strong>
-          </div>
-        </div>
+            else {
+                fakeToast(`${gameName} system coming soon.`);
+            }
 
-        <button class="modal-action" onclick="renderInventory()">
-          🎒 Envanteri Aç
-        </button>
-      </div>
-    </section>
-  `;
-}
+        });
 
-function renderInventory() {
-  const itemsHtml =
-    inventory.length === 0
-      ? `<p class="empty-text">Henüz envanterinde item yok.</p>`
-      : inventory
-          .map(
-            (item) => `
-              <div class="inventory-item">
-                <span>${item.split(" ")[0]}</span>
-                <strong>${item}</strong>
-              </div>
-            `
-          )
-          .join("");
-
-  mainScreen.innerHTML = `
-    <section class="page-screen">
-      <div class="profile-card">
-        <h2>🎒 Envanter</h2>
-        <p>Kazandığın ödüller burada görünür.</p>
-
-        <div class="inventory-list">
-          ${itemsHtml}
-        </div>
-
-        <button class="modal-action" onclick="renderProfile()">
-          Profile Dön
-        </button>
-      </div>
-    </section>
-  `;
-}
-
-function renderTasks() {
-  mainScreen.innerHTML = `
-    <section class="page-screen">
-      <div class="profile-card">
-        <h2>📋 Tasks</h2>
-        <p>Görevleri tamamla, yıldız kazan.</p>
-
-        <div class="task-list">
-          <button onclick="completeTask(5)">Telegram kanalına katıl +5 ⭐</button>
-          <button onclick="completeTask(10)">Arkadaş davet et +10 ⭐</button>
-          <button onclick="completeTask(3)">Günlük giriş +3 ⭐</button>
-        </div>
-      </div>
-    </section>
-  `;
-}
-
-function completeTask(amount) {
-  balance += amount;
-  document.getElementById("starBalance").textContent = balance;
-  showToast(`Görev tamamlandı: +${amount} ⭐`);
-}
-
-function renderComingSoon(title) {
-  mainScreen.innerHTML = `
-    <section class="page-screen">
-      <div class="profile-card">
-        <h2>${title}</h2>
-        <p>Bu bölüm sonraki aşamada aktif edilecek.</p>
-
-        <button class="modal-action" onclick="renderHome()">
-          Cases Ana Sayfasına Dön
-        </button>
-      </div>
-    </section>
-  `;
-}
-
-function openDailyReward() {
-  const rewards = [
-    "🎁 Gift Box",
-    "💎 Diamond",
-    "⭐ 5 Stars",
-    "🎟️ Ticket",
-    "🔥 Rare Item"
-  ];
-
-  const reward = rewards[Math.floor(Math.random() * rewards.length)];
-
-  inventory.push(reward);
-  balance += 5;
-
-  document.getElementById("starBalance").textContent = balance;
-
-  mainScreen.innerHTML = `
-    <section class="page-screen">
-      <div class="profile-card">
-        <h2>🎁 Daily Reward</h2>
-        <p>Günlük ödülün başarıyla açıldı.</p>
-
-        <div class="reward-box">
-          <span>${reward.split(" ")[0]}</span>
-          <strong>${reward}</strong>
-        </div>
-
-        <button class="modal-action" onclick="renderInventory()">
-          Envantere Git
-        </button>
-      </div>
-    </section>
-  `;
-}
-
-function reconnectCaseCards() {
-  const newCaseCards = document.querySelectorAll(".case-card");
-
-  newCaseCards.forEach((card) => {
-    card.addEventListener("click", () => {
-      openPage(card.dataset.page);
     });
-  });
+
 }
 
-function showToast(message) {
-  alert(message);
+/* BALANCE */
+
+function updateBalance() {
+
+    const pills = document.querySelectorAll(".balance-pill");
+
+    pills[0].innerHTML = `⭐ ${balance}`;
+    pills[1].innerHTML = `🎟️ ${tickets}`;
+
 }
 
-const liveItems = document.getElementById("liveItems");
+/* TOAST */
 
-let scrollPosition = 0;
+function fakeToast(message) {
+
+    const oldToast = document.querySelector(".toast");
+
+    if (oldToast) {
+        oldToast.remove();
+    }
+
+    const toast = document.createElement("div");
+
+    toast.className = "toast";
+
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 50);
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+
+    }, 2400);
+
+}
+
+/* LIVE ITEMS AUTO SCROLL */
+
+const liveItems = document.querySelector(".live-items");
+
+let scrollPos = 0;
 
 setInterval(() => {
-  scrollPosition += 1;
 
-  liveItems.scrollTo({
-    left: scrollPosition,
-    behavior: "smooth"
-  });
+    scrollPos += 1;
 
-  if (scrollPosition > liveItems.scrollWidth / 2) {
-    scrollPosition = 0;
-  }
-}, 30);
+    liveItems.scrollTo({
+        left: scrollPos,
+        behavior: "smooth"
+    });
 
-console.log("Ares Case Mini App Active");
-console.log("Telegram User:", user);
+    if (scrollPos > liveItems.scrollWidth / 2) {
+        scrollPos = 0;
+    }
+
+}, 35);
+
+/* START */
+
+fakeToast("Ares Mini App Loaded");
