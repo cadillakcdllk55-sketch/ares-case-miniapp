@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Ares Case</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="top-header">
+      <button class="close-btn">× Close</button>
+
+      <div class="balance-bar">
+        <div class="balance-pill">
+          <span>⭐</span>
+          <strong id="starBalance">35</strong>
+          <button>+</button>
+        </div>
+
+        <div class="balance-pill">
+          <span>🎟️</span>
+          <strong id="ticketBalance">2</strong>
+          <button>+</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="live-strip">
+      <span class="live-label">LIVE</span>
+
+      <div class="live-items" id="liveItems">
+        <span>🎁</span>
+        <span>🧙‍♂️</span>
+        <span>🌙</span>
+        <span>🎂</span>
+        <span>💎</span>
+        <span>🧪</span>
+        <span>🎰</span>
+        <span>🦄</span>
+        <span>🧧</span>
+        <span>🛡️</span>
+        <span>🐉</span>
+        <span>⚔️</span>
+        <span>🎲</span>
+        <span>👑</span>
+        <span>🔥</span>
+      </div>
+    </section>
+
+    <main class="main-screen">
+      <section class="case-menu">
+        <button class="case-card dark" data-page="Free Case">
+          <div class="case-icon">🎁</div>
+
+          <div>
+            <h3>Free</h3>
+            <p>2 cases</p>
+          </div>
+        </button>
+
+        <button class="case-card blue" data-page="Roulette">
+          <div class="case-icon">⭐</div>
+
+          <div>
+            <h3>Roulette</h3>
+            <p>15 cases</p>
+          </div>
+        </button>
+
+        <button class="case-card orange" data-page="PvP">
+          <div class="case-icon">⚔️</div>
+
+          <div>
+            <h3>PvP</h3>
+            <p>Online</p>
+          </div>
+        </button>
+
+        <button class="case-card navy" data-page="Crash">
+          <div class="case-icon">🚀</div>
+
+          <div>
+            <h3>Crash</h3>
+            <p>Online</p>
+          </div>
+        </button>
+
+        <button class="case-card red" data-page="Slots">
+          <div class="case-icon">🎰</div>
+
+          <div>
+            <h3>Slots</h3>
+            <p>5 cases</p>
+          </div>
+        </button>
+
+        <button class="case-card green" data-page="Eggs">
+          <div class="case-icon">🥚</div>
+
+          <div>
+            <h3>Eggs</h3>
+            <p>6 cases</p>
+          </div>
+        </button>
+
+        <button class="case-card purple" data-page="Upgrade">
+          <div class="case-icon">🐸</div>
+
+          <div>
+            <h3>Upgrade</h3>
+            <p>Improve your gifts</p>
+          </div>
+        </button>
+
+        <button class="about-btn" data-page="About">
+          ℹ️ About the game
+        </button>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="active" data-page="Cases">
+        <span>📦</span>
+        <small>Cases</small>
+      </button>
+
+      <button data-page="Raffles">
+        <span>🎁</span>
+        <small>Raffles</small>
+      </button>
+
+      <button data-page="Tasks">
+        <span>📋</span>
+        <small>Tasks</small>
+        <b>9</b>
+      </button>
+
+      <button data-page="Leaderboard">
+        <span>🌐</span>
+        <small>Leaderboard</small>
+      </button>
+
+      <button data-page="Profile">
+        <span>👤</span>
+        <small>Profile</small>
+      </button>
+    </nav>
+
+    <div class="modal hidden" id="dailyModal">
+      <div class="modal-card">
+        <button class="modal-close" id="closeModal">×</button>
+
+        <div class="modal-items">
+          <span>🎁</span>
+          <span>🧧</span>
+          <span>🍌</span>
+        </div>
+
+        <h2>A free daily case is available to you!</h2>
+
+        <p>
+          Cool prizes are waiting inside. Open your daily case before it expires.
+        </p>
+
+        <button class="modal-action" id="goDaily">Go to</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
