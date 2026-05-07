@@ -14,11 +14,17 @@ body {
     overflow-x: hidden;
 }
 
+body {
+    overscroll-behavior: none;
+}
+
 .app {
     width: 100%;
     min-height: 100vh;
     padding-bottom: 92px;
-    background: radial-gradient(circle at top, #174ca8 0%, #081632 34%, #050914 100%);
+    background:
+        radial-gradient(circle at top, rgba(58, 126, 255, 0.65) 0%, rgba(8, 22, 50, 0.92) 34%, #050914 100%),
+        linear-gradient(180deg, #0b1a3d, #050914);
 }
 
 .top-header {
@@ -43,6 +49,7 @@ body {
     color: #ffffff;
     letter-spacing: 1px;
     flex-shrink: 0;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
 }
 
 .live-items {
@@ -67,6 +74,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 21px;
+    box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.05);
 }
 
 .balance-area {
@@ -124,15 +132,16 @@ body {
 }
 
 .game-card {
-    min-height: 72px;
-    border-radius: 22px;
+    min-height: 74px;
+    border-radius: 24px;
     padding: 14px 16px;
     display: flex;
     align-items: center;
     gap: 14px;
     cursor: pointer;
     transition: 0.2s;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.34);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .game-card:hover {
@@ -140,14 +149,14 @@ body {
 }
 
 .game-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
+    width: 54px;
+    height: 54px;
+    border-radius: 17px;
     background: rgba(255, 255, 255, 0.16);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 27px;
+    font-size: 28px;
     flex-shrink: 0;
 }
 
@@ -193,22 +202,50 @@ body {
     width: 100%;
     max-width: 430px;
     margin: 0 auto;
-    padding-top: 12px;
+    padding-top: 4px;
+}
+
+.case-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.case-title h2 {
+    font-size: 26px;
+    margin-bottom: 3px;
+}
+
+.case-title p {
+    opacity: 0.72;
+    font-size: 13px;
+}
+
+.back-btn {
+    border: none;
+    border-radius: 14px;
+    padding: 11px 13px;
+    color: white;
+    background: rgba(255, 255, 255, 0.15);
+    font-weight: 800;
+    cursor: pointer;
 }
 
 .case-arrows {
     text-align: center;
     font-size: 34px;
     opacity: 0.8;
-    margin: 8px 0 12px;
+    margin: 4px 0 6px;
 }
 
 .case-prize-row {
     display: flex;
-    gap: 18px;
+    gap: 14px;
     overflow-x: auto;
     scrollbar-width: none;
-    padding: 16px 0;
+    padding: 12px 0;
+    scroll-snap-type: x mandatory;
 }
 
 .case-prize-row::-webkit-scrollbar {
@@ -216,18 +253,21 @@ body {
 }
 
 .case-preview-item {
-    min-width: 118px;
+    min-width: 112px;
     text-align: center;
+    scroll-snap-align: center;
 }
 
 .case-preview-icon {
-    width: 106px;
-    height: 106px;
+    width: 104px;
+    height: 104px;
     margin: 0 auto 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 62px;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .case-preview-price {
@@ -235,6 +275,7 @@ body {
     border-radius: 999px;
     padding: 8px 10px;
     font-weight: 800;
+    font-size: 13px;
 }
 
 .case-action-row {
@@ -257,8 +298,8 @@ body {
 .spin-btn {
     width: 100%;
     border: none;
-    border-radius: 18px;
-    padding: 17px;
+    border-radius: 19px;
+    padding: 18px;
     color: white;
     font-size: 18px;
     font-weight: 900;
@@ -267,12 +308,19 @@ body {
     cursor: pointer;
 }
 
+.demo-note {
+    margin-top: 12px;
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.72;
+}
+
 .case-opening-screen,
 .reward-screen {
     width: 100%;
     max-width: 430px;
     margin: 0 auto;
-    min-height: 330px;
+    min-height: 340px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -281,9 +329,9 @@ body {
 
 .spinner-area {
     width: 100%;
-    height: 116px;
+    height: 122px;
     overflow: hidden;
-    border-radius: 28px;
+    border-radius: 30px;
     background: rgba(255, 255, 255, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
@@ -308,18 +356,18 @@ body {
     align-items: center;
     gap: 16px;
     padding: 0 16px;
-    animation: spinTrack 3.4s cubic-bezier(0.12, 0.82, 0.22, 1) forwards;
+    animation: spinTrack 3.8s cubic-bezier(0.12, 0.82, 0.22, 1) forwards;
 }
 
 .spinner-item {
-    min-width: 74px;
-    height: 74px;
-    border-radius: 21px;
+    min-width: 76px;
+    height: 76px;
+    border-radius: 22px;
     background: rgba(255, 255, 255, 0.14);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 34px;
+    font-size: 35px;
 }
 
 @keyframes spinTrack {
@@ -328,7 +376,7 @@ body {
     }
 
     100% {
-        transform: translateX(-565px);
+        transform: translateX(-1200px);
     }
 }
 
@@ -338,16 +386,29 @@ body {
 }
 
 .reward-icon {
-    width: 118px;
-    height: 118px;
-    border-radius: 31px;
+    width: 122px;
+    height: 122px;
+    border-radius: 32px;
     background: linear-gradient(135deg, #ffb700, #ff7300);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 62px;
+    font-size: 64px;
     margin-bottom: 20px;
     box-shadow: 0 0 58px rgba(255, 183, 0, 0.42);
+    animation: rewardPop 0.35s ease;
+}
+
+@keyframes rewardPop {
+    from {
+        opacity: 0;
+        transform: scale(0.68);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .reward-screen h2 {
@@ -514,6 +575,10 @@ body {
     font-size: 30px;
 }
 
+.inventory-item small {
+    opacity: 0.65;
+}
+
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -628,6 +693,12 @@ body {
     font-weight: 800;
 }
 
+.prize-name {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.72;
+}
+
 .modal-bottom-btn {
     width: 100%;
     margin-top: 18px;
@@ -653,6 +724,9 @@ body {
     transition: 0.25s;
     z-index: 300;
     white-space: nowrap;
+    max-width: calc(100vw - 32px);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .toast.show {

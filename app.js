@@ -3,6 +3,8 @@ const tg = window.Telegram?.WebApp;
 if (tg) {
     tg.ready();
     tg.expand();
+    tg.setHeaderColor("#071124");
+    tg.setBackgroundColor("#071124");
 }
 
 const user = tg?.initDataUnsafe?.user || {
@@ -18,33 +20,44 @@ let balance = 35;
 let tickets = 2;
 let inventory = [];
 let demoMode = true;
+let currentCaseName = "Free Case";
 let currentCaseOpening = false;
 
 const prizes = [
-    { icon: "🐒", name: "Monkey", value: 19044, rarity: "Mythic" },
-    { icon: "🦾", name: "Robot Arm", value: 17969, rarity: "Mythic" },
-    { icon: "👜", name: "Luxury Bag", value: 15536, rarity: "Legendary" },
-    { icon: "💼", name: "Blue Case", value: 3727, rarity: "Epic" },
-    { icon: "💍", name: "Green Ring", value: 3153, rarity: "Epic" },
-    { icon: "📣", name: "Megaphone", value: 1876, rarity: "Rare" },
-    { icon: "🎃", name: "Pumpkin", value: 1288, rarity: "Rare" },
-    { icon: "🌼", name: "White Flower", value: 1154, rarity: "Rare" },
-    { icon: "🎨", name: "Painter", value: 966, rarity: "Rare" },
-    { icon: "🧪", name: "Laser Sword", value: 593, rarity: "Common" },
-    { icon: "💸", name: "Money Bag", value: 576, rarity: "Common" },
-    { icon: "🎈", name: "Balloon", value: 432, rarity: "Common" },
-    { icon: "🐟", name: "Fish Tank", value: 347, rarity: "Common" },
-    { icon: "🥭", name: "Jungle Case", value: 343, rarity: "Common" },
-    { icon: "🍌", name: "Banana", value: 339, rarity: "Common" },
-    { icon: "🌀", name: "Magic Portal", value: 327, rarity: "Common" },
-    { icon: "🦊", name: "Fox Toy", value: 322, rarity: "Common" },
-    { icon: "⭐", name: "100 Stars", value: 100, rarity: "Bonus" },
-    { icon: "⭐", name: "75 Stars", value: 75, rarity: "Bonus" },
-    { icon: "⭐", name: "50 Stars", value: 50, rarity: "Bonus" },
-    { icon: "⭐", name: "25 Stars", value: 25, rarity: "Bonus" },
-    { icon: "⭐", name: "15 Stars", value: 15, rarity: "Bonus" },
-    { icon: "⭐", name: "10 Stars", value: 10, rarity: "Bonus" },
-    { icon: "⭐", name: "5 Stars", value: 5, rarity: "Bonus" }
+    { icon: "🐒", name: "Monkey", value: 19044, rarity: "Mythic", weight: 1 },
+    { icon: "🦾", name: "Robot Arm", value: 17969, rarity: "Mythic", weight: 1 },
+    { icon: "👜", name: "Luxury Bag", value: 15536, rarity: "Legendary", weight: 2 },
+    { icon: "💼", name: "Blue Case", value: 3727, rarity: "Epic", weight: 5 },
+    { icon: "💍", name: "Green Ring", value: 3153, rarity: "Epic", weight: 5 },
+    { icon: "📣", name: "Megaphone", value: 1876, rarity: "Rare", weight: 10 },
+    { icon: "🎃", name: "Pumpkin", value: 1288, rarity: "Rare", weight: 10 },
+    { icon: "🌼", name: "White Flower", value: 1154, rarity: "Rare", weight: 10 },
+    { icon: "🎨", name: "Painter", value: 966, rarity: "Rare", weight: 10 },
+    { icon: "🧪", name: "Laser Sword", value: 593, rarity: "Common", weight: 18 },
+    { icon: "💸", name: "Money Bag", value: 576, rarity: "Common", weight: 18 },
+    { icon: "🎈", name: "Balloon", value: 432, rarity: "Common", weight: 20 },
+    { icon: "🐟", name: "Fish Tank", value: 347, rarity: "Common", weight: 22 },
+    { icon: "🥭", name: "Jungle Case", value: 343, rarity: "Common", weight: 22 },
+    { icon: "🍌", name: "Banana", value: 339, rarity: "Common", weight: 22 },
+    { icon: "🌀", name: "Magic Portal", value: 327, rarity: "Common", weight: 22 },
+    { icon: "🦊", name: "Fox Toy", value: 322, rarity: "Common", weight: 22 },
+    { icon: "⭐", name: "100 Stars", value: 100, rarity: "Bonus", weight: 14 },
+    { icon: "⭐", name: "75 Stars", value: 75, rarity: "Bonus", weight: 16 },
+    { icon: "⭐", name: "50 Stars", value: 50, rarity: "Bonus", weight: 18 },
+    { icon: "⭐", name: "25 Stars", value: 25, rarity: "Bonus", weight: 20 },
+    { icon: "⭐", name: "15 Stars", value: 15, rarity: "Bonus", weight: 22 },
+    { icon: "⭐", name: "10 Stars", value: 10, rarity: "Bonus", weight: 25 },
+    { icon: "⭐", name: "5 Stars", value: 5, rarity: "Bonus", weight: 30 }
+];
+
+const cases = [
+    { name: "Free Case", title: "Free", subtitle: "2 cases", icon: "🎁", className: "gray", price: 0 },
+    { name: "Roulette", title: "Roulette", subtitle: "15 cases", icon: "⭐", className: "blue", price: 15 },
+    { name: "PvP", title: "PvP", subtitle: "Online", icon: "⚔️", className: "orange", price: 20 },
+    { name: "Crash", title: "Crash", subtitle: "Online", icon: "🚀", className: "dark", price: 25 },
+    { name: "Slots", title: "Slots", subtitle: "5 cases", icon: "🎰", className: "red", price: 10 },
+    { name: "Eggs", title: "Eggs", subtitle: "6 cases", icon: "🥚", className: "green", price: 8 },
+    { name: "Upgrade", title: "Upgrade", subtitle: "Improve your gifts", icon: "⬆️", className: "purple", price: 0 }
 ];
 
 startApp();
@@ -57,6 +70,7 @@ function startApp() {
     updateProfile();
     updateBalance();
     bindNavigation();
+    startLiveScroll();
     fakeToast("Ares Mini App Loaded");
 }
 
@@ -70,6 +84,14 @@ function bindNavigation() {
 
             screens.forEach((screen) => screen.classList.remove("active"));
             document.getElementById(target).classList.add("active");
+
+            if (target === "home-screen") {
+                renderHome();
+            }
+
+            if (target === "profile-screen") {
+                updateProfile();
+            }
         });
     });
 }
@@ -79,61 +101,20 @@ function renderHome() {
 
     homeScreen.innerHTML = `
         <div class="game-list">
-            <div class="game-card gray" data-case="Free Case">
-                <div class="game-icon">🎁</div>
-                <div class="game-info">
-                    <h3>Free</h3>
-                    <p>2 cases</p>
-                </div>
-            </div>
+            ${cases
+                .map(
+                    (caseItem) => `
+                        <div class="game-card ${caseItem.className}" data-case="${caseItem.name}">
+                            <div class="game-icon">${caseItem.icon}</div>
 
-            <div class="game-card blue" data-case="Roulette">
-                <div class="game-icon">⭐</div>
-                <div class="game-info">
-                    <h3>Roulette</h3>
-                    <p>15 cases</p>
-                </div>
-            </div>
-
-            <div class="game-card orange" data-case="PvP">
-                <div class="game-icon">⚔️</div>
-                <div class="game-info">
-                    <h3>PvP</h3>
-                    <p>Online</p>
-                </div>
-            </div>
-
-            <div class="game-card dark" data-case="Crash">
-                <div class="game-icon">🚀</div>
-                <div class="game-info">
-                    <h3>Crash</h3>
-                    <p>Online</p>
-                </div>
-            </div>
-
-            <div class="game-card red" data-case="Slots">
-                <div class="game-icon">🎰</div>
-                <div class="game-info">
-                    <h3>Slots</h3>
-                    <p>5 cases</p>
-                </div>
-            </div>
-
-            <div class="game-card green" data-case="Eggs">
-                <div class="game-icon">🥚</div>
-                <div class="game-info">
-                    <h3>Eggs</h3>
-                    <p>6 cases</p>
-                </div>
-            </div>
-
-            <div class="game-card purple" data-case="Upgrade">
-                <div class="game-icon">⬆️</div>
-                <div class="game-info">
-                    <h3>Upgrade</h3>
-                    <p>Improve your gifts</p>
-                </div>
-            </div>
+                            <div class="game-info">
+                                <h3>${caseItem.title}</h3>
+                                <p>${caseItem.subtitle}</p>
+                            </div>
+                        </div>
+                    `
+                )
+                .join("")}
         </div>
     `;
 
@@ -145,11 +126,23 @@ function renderHome() {
 }
 
 function renderCasePage(caseName) {
+    currentCaseName = caseName;
+
+    const selectedCase = cases.find((caseItem) => caseItem.name === caseName) || cases[0];
     const homeScreen = document.getElementById("home-screen");
-    const previewItems = prizes.slice(3, 9);
+    const previewItems = [...prizes].sort((a, b) => b.value - a.value).slice(0, 10);
 
     homeScreen.innerHTML = `
         <div class="case-page">
+            <div class="case-header">
+                <button class="back-btn" id="backToCasesBtn">← Cases</button>
+
+                <div class="case-title">
+                    <h2>${selectedCase.title}</h2>
+                    <p>${selectedCase.price === 0 ? "Free spin available" : `Spin price: ⭐ ${selectedCase.price}`}</p>
+                </div>
+            </div>
+
             <div class="case-arrows">⌄</div>
 
             <div class="case-prize-row">
@@ -172,10 +165,17 @@ function renderCasePage(caseName) {
                 <button class="case-mini-btn" id="prizesBtn">🎁 Prizes</button>
             </div>
 
-            <button class="spin-btn" id="spinBtn">Spin</button>
+            <button class="spin-btn" id="spinBtn">
+                ${demoMode ? "Spin Demo" : selectedCase.price === 0 ? "Spin Free" : `Spin • ⭐ ${selectedCase.price}`}
+            </button>
+
+            <div class="demo-note">
+                ${demoMode ? "Demo mode is active. Prizes will not be credited." : "Real mode active. Rewards will be added to inventory."}
+            </div>
         </div>
     `;
 
+    document.getElementById("backToCasesBtn").addEventListener("click", renderHome);
     document.getElementById("settingsBtn").addEventListener("click", openSettingsModal);
     document.getElementById("prizesBtn").addEventListener("click", openPrizesModal);
     document.getElementById("spinBtn").addEventListener("click", () => openCase(caseName));
@@ -184,20 +184,29 @@ function renderCasePage(caseName) {
 function openCase(caseName) {
     if (currentCaseOpening) return;
 
+    const selectedCase = cases.find((caseItem) => caseItem.name === caseName) || cases[0];
+
+    if (!demoMode && selectedCase.price > 0 && balance < selectedCase.price) {
+        fakeToast("Insufficient stars.");
+        return;
+    }
+
+    if (!demoMode && selectedCase.price > 0) {
+        balance -= selectedCase.price;
+        updateBalance();
+    }
+
     currentCaseOpening = true;
 
-    const reward = prizes[Math.floor(Math.random() * prizes.length)];
+    const reward = getWeightedPrize();
+    const reelItems = buildReelItems(reward);
     const homeScreen = document.getElementById("home-screen");
 
     homeScreen.innerHTML = `
         <div class="case-opening-screen">
             <div class="spinner-area">
                 <div class="spinner-track">
-                    ${prizes
-                        .slice(0, 8)
-                        .map((item) => `<div class="spinner-item">${item.icon}</div>`)
-                        .join("")}
-                    <div class="spinner-item">${reward.icon}</div>
+                    ${reelItems.map((item) => `<div class="spinner-item">${item.icon}</div>`).join("")}
                 </div>
             </div>
 
@@ -207,13 +216,11 @@ function openCase(caseName) {
 
     setTimeout(() => {
         if (!demoMode) {
-            inventory.push(reward);
-        }
-
-        if (reward.rarity === "Bonus") {
-            balance += reward.value;
-        } else {
-            balance += 5;
+            if (reward.rarity === "Bonus") {
+                balance += reward.value;
+            } else {
+                inventory.unshift(reward);
+            }
         }
 
         updateBalance();
@@ -224,7 +231,9 @@ function openCase(caseName) {
                 <div class="reward-icon">${reward.icon}</div>
                 <h2>${reward.name}</h2>
                 <p>${reward.rarity} • ⭐ ${reward.value.toLocaleString()}</p>
-                <button class="claim-btn" id="claimRewardBtn">CLAIM</button>
+                <button class="claim-btn" id="claimRewardBtn">
+                    ${demoMode ? "BACK" : "CLAIM"}
+                </button>
             </div>
         `;
 
@@ -233,7 +242,34 @@ function openCase(caseName) {
         });
 
         currentCaseOpening = false;
-    }, 3500);
+    }, 3900);
+}
+
+function getWeightedPrize() {
+    const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+    let random = Math.random() * totalWeight;
+
+    for (const prize of prizes) {
+        random -= prize.weight;
+
+        if (random <= 0) {
+            return prize;
+        }
+    }
+
+    return prizes[prizes.length - 1];
+}
+
+function buildReelItems(finalPrize) {
+    const reel = [];
+
+    for (let i = 0; i < 20; i++) {
+        reel.push(prizes[Math.floor(Math.random() * prizes.length)]);
+    }
+
+    reel.push(finalPrize);
+
+    return reel;
 }
 
 function openSettingsModal() {
@@ -241,15 +277,16 @@ function openSettingsModal() {
 
     const modal = document.createElement("div");
     modal.className = "modal-backdrop";
+
     modal.innerHTML = `
         <div class="modal-box">
-            <button class="modal-close" onclick="closeModal()">×</button>
+            <button class="modal-close" id="modalCloseBtn">×</button>
             <div class="modal-title">Case settings</div>
 
             <div class="settings-row">
                 <div>
                     <h3>Demo mode</h3>
-                    <p>All cases are free, but prizes won't be credited</p>
+                    <p>All cases are free, but prizes won't be credited.</p>
                 </div>
 
                 <button class="switch ${demoMode ? "active" : ""}" id="demoSwitch">
@@ -257,47 +294,58 @@ function openSettingsModal() {
                 </button>
             </div>
 
-            <button class="modal-bottom-btn" onclick="closeModal()">Close</button>
+            <button class="modal-bottom-btn" id="modalBottomCloseBtn">Close</button>
         </div>
     `;
 
     document.body.appendChild(modal);
 
+    document.getElementById("modalCloseBtn").addEventListener("click", closeModal);
+    document.getElementById("modalBottomCloseBtn").addEventListener("click", closeModal);
+
     document.getElementById("demoSwitch").addEventListener("click", () => {
         demoMode = !demoMode;
         document.getElementById("demoSwitch").classList.toggle("active", demoMode);
         fakeToast(demoMode ? "Demo mode enabled" : "Demo mode disabled");
+        renderCasePage(currentCaseName);
     });
 }
 
 function openPrizesModal() {
     closeModal();
 
+    const sortedPrizes = [...prizes].sort((a, b) => b.value - a.value);
+
     const modal = document.createElement("div");
     modal.className = "modal-backdrop";
+
     modal.innerHTML = `
         <div class="modal-box">
-            <button class="modal-close" onclick="closeModal()">×</button>
+            <button class="modal-close" id="modalCloseBtn">×</button>
             <div class="modal-title">Possible prizes</div>
 
             <div class="prize-grid">
-                ${prizes
+                ${sortedPrizes
                     .map(
                         (item) => `
                             <div class="prize-card">
                                 <div class="prize-icon">${item.icon}</div>
                                 <div class="prize-price">⭐ ${item.value.toLocaleString()}</div>
+                                <div class="prize-name">${item.name}</div>
                             </div>
                         `
                     )
                     .join("")}
             </div>
 
-            <button class="modal-bottom-btn" onclick="closeModal()">Close</button>
+            <button class="modal-bottom-btn" id="modalBottomCloseBtn">Close</button>
         </div>
     `;
 
     document.body.appendChild(modal);
+
+    document.getElementById("modalCloseBtn").addEventListener("click", closeModal);
+    document.getElementById("modalBottomCloseBtn").addEventListener("click", closeModal);
 }
 
 function closeModal() {
@@ -316,28 +364,35 @@ function renderTasks() {
             <div class="task-card">
                 <div>
                     <h3>Join Telegram Channel</h3>
-                    <p>+500 coins</p>
+                    <p>+500 stars</p>
                 </div>
-                <button>GO</button>
+                <button onclick="completeTask(500)">GO</button>
             </div>
 
             <div class="task-card">
                 <div>
                     <h3>Invite 3 Friends</h3>
-                    <p>+1500 coins</p>
+                    <p>+1500 stars</p>
                 </div>
-                <button>GO</button>
+                <button onclick="completeTask(1500)">GO</button>
             </div>
 
             <div class="task-card">
                 <div>
                     <h3>Daily Login</h3>
-                    <p>+250 coins</p>
+                    <p>+250 stars</p>
                 </div>
-                <button>CLAIM</button>
+                <button onclick="completeTask(250)">CLAIM</button>
             </div>
         </div>
     `;
+}
+
+function completeTask(amount) {
+    balance += amount;
+    updateBalance();
+    updateProfile();
+    fakeToast(`+${amount} stars added.`);
 }
 
 function renderRaffles() {
@@ -354,7 +409,7 @@ function renderRaffles() {
                 <div class="raffle-fill"></div>
             </div>
 
-            <button class="join-btn">JOIN NOW</button>
+            <button class="join-btn" onclick="fakeToast('Raffle joined.')">JOIN NOW</button>
         </div>
     `;
 }
@@ -387,11 +442,12 @@ function renderLeaderboard() {
 
 function updateProfile() {
     const profileScreen = document.getElementById("profile-screen");
+    const displayName = user.username ? `@${user.username}` : user.first_name;
 
     profileScreen.innerHTML = `
         <div class="profile-card">
             <div class="profile-avatar">${user.first_name.charAt(0)}</div>
-            <h2>${user.username || user.first_name}</h2>
+            <h2>${displayName}</h2>
             <p>ID: ${user.id}</p>
 
             <div class="profile-stats">
@@ -411,8 +467,8 @@ function updateProfile() {
                 </div>
 
                 <div class="stat-box">
-                    <h3>1</h3>
-                    <p>Level</p>
+                    <h3>${demoMode ? "ON" : "OFF"}</h3>
+                    <p>Demo</p>
                 </div>
             </div>
 
@@ -430,7 +486,7 @@ function updateProfile() {
                                             <span>${item.icon}</span>
                                             <div>
                                                 <h4>${item.name}</h4>
-                                                <p>${item.rarity}</p>
+                                                <small>${item.rarity} • ⭐ ${item.value.toLocaleString()}</small>
                                             </div>
                                         </div>
                                       `
@@ -444,7 +500,7 @@ function updateProfile() {
 }
 
 function updateBalance() {
-    document.getElementById("starBalance").innerHTML = `⭐ ${balance}`;
+    document.getElementById("starBalance").innerHTML = `⭐ ${balance.toLocaleString()}`;
     document.getElementById("ticketBalance").innerHTML = `🎟️ ${tickets}`;
 }
 
@@ -470,18 +526,23 @@ function fakeToast(message) {
     }, 2200);
 }
 
-const liveItems = document.querySelector(".live-items");
-let scrollPos = 0;
+function startLiveScroll() {
+    const liveItems = document.getElementById("liveItems");
 
-setInterval(() => {
-    scrollPos += 1;
+    if (!liveItems) return;
 
-    liveItems.scrollTo({
-        left: scrollPos,
-        behavior: "smooth"
-    });
+    let scrollPos = 0;
 
-    if (scrollPos > liveItems.scrollWidth / 2) {
-        scrollPos = 0;
-    }
-}, 35);
+    setInterval(() => {
+        scrollPos += 1;
+
+        liveItems.scrollTo({
+            left: scrollPos,
+            behavior: "smooth"
+        });
+
+        if (scrollPos > liveItems.scrollWidth / 2) {
+            scrollPos = 0;
+        }
+    }, 35);
+}
