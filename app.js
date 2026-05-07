@@ -19,12 +19,13 @@ let tickets = 2;
 let inventory = [];
 let currentCaseOpening = false;
 
+updateProfile();
+updateBalance();
+
 /* NAVIGATION */
 
 navButtons.forEach((button) => {
-
     button.addEventListener("click", () => {
-
         const target = button.dataset.screen;
 
         navButtons.forEach((btn) => {
@@ -38,36 +39,32 @@ navButtons.forEach((button) => {
         });
 
         document.getElementById(target).classList.add("active");
-
     });
-
 });
 
 /* PROFILE */
 
-updateProfile();
-
 function updateProfile() {
-
     const profileScreen = document.getElementById("profile-screen");
 
     profileScreen.innerHTML = `
-
         <div class="profile-card">
-
             <div class="profile-avatar">
                 ${user.first_name.charAt(0)}
             </div>
 
-            <h2>${user.username}</h2>
-
+            <h2>${user.username || user.first_name}</h2>
             <p>ID: ${user.id}</p>
 
             <div class="profile-stats">
-
                 <div class="stat-box">
                     <h3>${balance}</h3>
-                    <p>Coins</p>
+                    <p>Stars</p>
+                </div>
+
+                <div class="stat-box">
+                    <h3>${tickets}</h3>
+                    <p>Tickets</p>
                 </div>
 
                 <div class="stat-box">
@@ -75,145 +72,105 @@ function updateProfile() {
                     <p>Items</p>
                 </div>
 
+                <div class="stat-box">
+                    <h3>1</h3>
+                    <p>Level</p>
+                </div>
             </div>
 
             <div class="inventory-section">
-
-                <h3 class="inventory-title">
-                    Inventory
-                </h3>
+                <h3 class="inventory-title">Inventory</h3>
 
                 <div class="inventory-list">
-
                     ${
                         inventory.length === 0
-                        ?
-                        `
-                        <div class="empty-inventory">
-                            No items yet.
-                        </div>
-                        `
-                        :
-                        inventory.map(item => `
-                            <div class="inventory-item">
-
-                                <span>${item.icon}</span>
-
-                                <div>
-                                    <h4>${item.name}</h4>
-                                    <p>${item.rarity}</p>
+                            ? `
+                                <div class="empty-inventory">
+                                    No items yet.
                                 </div>
+                              `
+                            : inventory
+                                  .map(
+                                      (item) => `
+                                        <div class="inventory-item">
+                                            <span>${item.icon}</span>
 
-                            </div>
-                        `).join("")
+                                            <div>
+                                                <h4>${item.name}</h4>
+                                                <p>${item.rarity}</p>
+                                            </div>
+                                        </div>
+                                      `
+                                  )
+                                  .join("")
                     }
-
                 </div>
-
             </div>
-
         </div>
-
     `;
-
 }
 
 /* CASE SYSTEM */
 
-const gameCards = document.querySelectorAll(".game-card");
+function bindGameCards() {
+    const gameCards = document.querySelectorAll(".game-card");
 
-gameCards.forEach((card) => {
+    gameCards.forEach((card) => {
+        card.addEventListener("click", () => {
+            const gameName = card.querySelector("h3").innerText;
 
-    card.addEventListener("click", () => {
+            if (gameName === "Free") {
+                openCase("Free Case");
+                return;
+            }
 
-        const gameName = card.querySelector("h3").innerText;
-
-        if (gameName === "Free") {
-            openCase("Free Case");
-        }
-
-        else if (gameName === "Roulette") {
-            fakeToast("Roulette system coming soon.");
-        }
-
-        else if (gameName === "PvP") {
-            fakeToast("PvP battles coming soon.");
-        }
-
-        else if (gameName === "Crash") {
-            fakeToast("Crash system coming soon.");
-        }
-
-        else if (gameName === "Slots") {
-            fakeToast("Slots system coming soon.");
-        }
-
-        else if (gameName === "Eggs") {
-            fakeToast("Egg opening system coming soon.");
-        }
-
-        else if (gameName === "Upgrade") {
-            fakeToast("Upgrade system coming soon.");
-        }
-
+            fakeToast(`${gameName} system coming soon.`);
+        });
     });
+}
 
-});
+bindGameCards();
 
 function openCase(caseName) {
-
     if (currentCaseOpening) return;
 
     currentCaseOpening = true;
 
     const rewards = [
-
         {
             icon: "💎",
             name: "Diamond",
             rarity: "Legendary"
         },
-
         {
             icon: "🔥",
             name: "Fire Blade",
             rarity: "Epic"
         },
-
         {
             icon: "🎟️",
             name: "Ticket",
             rarity: "Rare"
         },
-
         {
             icon: "🪙",
             name: "Golden Coin",
             rarity: "Common"
         },
-
         {
             icon: "👑",
             name: "King Crown",
             rarity: "Mythic"
         }
-
     ];
 
-    const reward = rewards[
-        Math.floor(Math.random() * rewards.length)
-    ];
-
+    const reward = rewards[Math.floor(Math.random() * rewards.length)];
     const homeScreen = document.getElementById("home-screen");
 
     homeScreen.innerHTML = `
-
-        <div class="case-opening-screen">
-
+        <div class="case-opening-screen compact-view">
             <div class="spinner-area">
-
                 <div class="spinner-track">
-
                     <div class="spinner-item">💎</div>
                     <div class="spinner-item">🔥</div>
                     <div class="spinner-item">🎟️</div>
@@ -222,72 +179,53 @@ function openCase(caseName) {
                     <div class="spinner-item">💣</div>
                     <div class="spinner-item">⚔️</div>
                     <div class="spinner-item">🚀</div>
-
+                    <div class="spinner-item">${reward.icon}</div>
                 </div>
-
             </div>
 
             <div class="opening-status">
                 Opening ${caseName}...
             </div>
-
         </div>
-
     `;
 
     setTimeout(() => {
-
         inventory.push(reward);
-
         balance += 5;
 
         updateBalance();
         updateProfile();
 
         homeScreen.innerHTML = `
-
-            <div class="reward-screen">
-
+            <div class="reward-screen compact-view">
                 <div class="reward-icon">
                     ${reward.icon}
                 </div>
 
                 <h2>${reward.name}</h2>
-
                 <p>${reward.rarity}</p>
 
                 <button class="claim-btn" id="claimRewardBtn">
                     CLAIM
                 </button>
-
             </div>
-
         `;
 
-        document
-            .getElementById("claimRewardBtn")
-            .addEventListener("click", () => {
-
-                renderHome();
-
-            });
+        document.getElementById("claimRewardBtn").addEventListener("click", () => {
+            renderHome();
+        });
 
         currentCaseOpening = false;
-
     }, 3500);
-
 }
 
 /* HOME RENDER */
 
 function renderHome() {
-
     const homeScreen = document.getElementById("home-screen");
 
     homeScreen.innerHTML = `
-
         <div class="game-list">
-
             <div class="game-card gray">
                 <div class="game-icon">🎁</div>
 
@@ -350,54 +288,29 @@ function renderHome() {
                     <p>Improve your gifts</p>
                 </div>
             </div>
-
         </div>
-
     `;
 
-    reconnectGameCards();
-
-}
-
-function reconnectGameCards() {
-
-    const cards = document.querySelectorAll(".game-card");
-
-    cards.forEach((card) => {
-
-        card.addEventListener("click", () => {
-
-            const gameName = card.querySelector("h3").innerText;
-
-            if (gameName === "Free") {
-                openCase("Free Case");
-            }
-
-            else {
-                fakeToast(`${gameName} system coming soon.`);
-            }
-
-        });
-
-    });
-
+    bindGameCards();
 }
 
 /* BALANCE */
 
 function updateBalance() {
-
     const pills = document.querySelectorAll(".balance-pill");
 
-    pills[0].innerHTML = `⭐ ${balance}`;
-    pills[1].innerHTML = `🎟️ ${tickets}`;
+    if (pills[0]) {
+        pills[0].innerHTML = `⭐ ${balance}`;
+    }
 
+    if (pills[1]) {
+        pills[1].innerHTML = `🎟️ ${tickets}`;
+    }
 }
 
 /* TOAST */
 
 function fakeToast(message) {
-
     const oldToast = document.querySelector(".toast");
 
     if (oldToast) {
@@ -407,7 +320,6 @@ function fakeToast(message) {
     const toast = document.createElement("div");
 
     toast.className = "toast";
-
     toast.innerText = message;
 
     document.body.appendChild(toast);
@@ -417,15 +329,12 @@ function fakeToast(message) {
     }, 50);
 
     setTimeout(() => {
-
         toast.classList.remove("show");
 
         setTimeout(() => {
             toast.remove();
         }, 300);
-
     }, 2400);
-
 }
 
 /* LIVE ITEMS AUTO SCROLL */
@@ -435,7 +344,6 @@ const liveItems = document.querySelector(".live-items");
 let scrollPos = 0;
 
 setInterval(() => {
-
     scrollPos += 1;
 
     liveItems.scrollTo({
@@ -446,7 +354,6 @@ setInterval(() => {
     if (scrollPos > liveItems.scrollWidth / 2) {
         scrollPos = 0;
     }
-
 }, 35);
 
 /* START */
