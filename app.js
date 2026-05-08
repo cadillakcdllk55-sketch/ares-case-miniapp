@@ -183,19 +183,26 @@ function renderCardArt(type) {
     }
 
     if (type === "pvp") {
-        return `
-            <div class="warrior-left">
-                <div class="warrior-head"></div>
-                <div class="warrior-body"></div>
+    return `
+        <div class="pvp-banner">
+            <div class="pvp-warrior left">
+                <div class="helmet"></div>
+                <div class="body"></div>
+                <div class="shield"></div>
                 <div class="sword"></div>
             </div>
-            <div class="warrior-right">
-                <div class="warrior-head"></div>
-                <div class="warrior-body"></div>
+
+            <div class="pvp-warrior right">
+                <div class="helmet"></div>
+                <div class="body"></div>
+                <div class="shield"></div>
                 <div class="sword"></div>
             </div>
-        `;
-    }
+
+            <div class="arena-fire"></div>
+        </div>
+    `;
+}
 
     if (type === "crash") {
         return `
