@@ -16,14 +16,16 @@ const user = tg?.initDataUnsafe?.user || {
 const screens = document.querySelectorAll(".screen");
 const navButtons = document.querySelectorAll(".nav-btn");
 
-let stars = 3500;
-let tickets = 20;
+let stars = 45;
+let tickets = 2;
 let inventory = [];
 let currentMode = null;
 let demoMode = true;
 let isBusy = false;
 let selectedSlotBet = 49;
 let selectedEggTier = null;
+let crashTimer = null;
+let crashCurrent = 1;
 
 const liveIcons = ["⚔️", "🔥", "🏛️", "🎁", "💎", "🛡️", "👑", "⚡", "🧿", "🗡️", "🥚", "🎰", "🚀", "🧨", "🪙"];
 
@@ -44,14 +46,22 @@ const mainPrizes = [
     { id: "p4", name: "Blue Safe", value: 8526, rarity: "Epic", emoji: "🔐", weight: 4 },
     { id: "p5", name: "Green Ring", value: 3659, rarity: "Epic", emoji: "💍", weight: 6 },
     { id: "p6", name: "Megaphone", value: 1956, rarity: "Rare", emoji: "📣", weight: 10 },
-    { id: "p7", name: "Painter", value: 972, rarity: "Rare", emoji: "🎨", weight: 12 },
-    { id: "p8", name: "Light Sword", value: 642, rarity: "Common", emoji: "🗡️", weight: 20 },
-    { id: "p9", name: "Angel Box", value: 591, rarity: "Common", emoji: "🎁", weight: 22 },
-    { id: "p10", name: "Banana", value: 358, rarity: "Common", emoji: "🍌", weight: 24 },
-    { id: "p11", name: "100 Stars", value: 100, rarity: "Bonus", emoji: "⭐", weight: 18 },
-    { id: "p12", name: "50 Stars", value: 50, rarity: "Bonus", emoji: "⭐", weight: 24 },
-    { id: "p13", name: "10 Stars", value: 10, rarity: "Bonus", emoji: "⭐", weight: 32 },
-    { id: "p14", name: "5 Stars", value: 5, rarity: "Bonus", emoji: "⭐", weight: 38 }
+    { id: "p7", name: "Pumpkin", value: 1329, rarity: "Rare", emoji: "🎃", weight: 11 },
+    { id: "p8", name: "White Flower", value: 1183, rarity: "Rare", emoji: "🌼", weight: 12 },
+    { id: "p9", name: "Painter", value: 972, rarity: "Rare", emoji: "🎨", weight: 12 },
+    { id: "p10", name: "Light Sword", value: 642, rarity: "Common", emoji: "🗡️", weight: 20 },
+    { id: "p11", name: "Angel Box", value: 591, rarity: "Common", emoji: "🎁", weight: 22 },
+    { id: "p12", name: "Balloon", value: 483, rarity: "Common", emoji: "🎈", weight: 24 },
+    { id: "p13", name: "Fish Tank", value: 362, rarity: "Common", emoji: "🐟", weight: 28 },
+    { id: "p14", name: "Banana", value: 358, rarity: "Common", emoji: "🍌", weight: 28 },
+    { id: "p15", name: "Magic Portal", value: 316, rarity: "Common", emoji: "🌀", weight: 30 },
+    { id: "p16", name: "100 Stars", value: 100, rarity: "Bonus", emoji: "⭐", weight: 20 },
+    { id: "p17", name: "75 Stars", value: 75, rarity: "Bonus", emoji: "⭐", weight: 24 },
+    { id: "p18", name: "50 Stars", value: 50, rarity: "Bonus", emoji: "⭐", weight: 28 },
+    { id: "p19", name: "25 Stars", value: 25, rarity: "Bonus", emoji: "⭐", weight: 32 },
+    { id: "p20", name: "15 Stars", value: 15, rarity: "Bonus", emoji: "⭐", weight: 36 },
+    { id: "p21", name: "10 Stars", value: 10, rarity: "Bonus", emoji: "⭐", weight: 42 },
+    { id: "p22", name: "5 Stars", value: 5, rarity: "Bonus", emoji: "⭐", weight: 48 }
 ];
 
 const slotPools = {
@@ -66,14 +76,24 @@ const slotPools = {
         { name: "Skull Flower", value: 1226, emoji: "💀" },
         { name: "Dark Orb", value: 887, emoji: "🧿" },
         { name: "Angel Box", value: 591, emoji: "🎁" },
+        { name: "Weed Bucket", value: 568, emoji: "🪴" },
+        { name: "Butterfly Gift", value: 432, emoji: "🦋" },
         { name: "Banana", value: 358, emoji: "🍌" },
+        { name: "Black Sheep", value: 326, emoji: "🐏" },
         { name: "Nothing", value: 0, emoji: "❌" }
     ],
     299: [
         { name: "Diamond Ring", value: 8526, emoji: "💎" },
         { name: "Rolex Watch", value: 7441, emoji: "⌚" },
         { name: "Vintage Car", value: 5773, emoji: "🚗" },
+        { name: "Blue Doll", value: 3763, emoji: "🧸" },
+        { name: "Pink Ghost", value: 1480, emoji: "👻" },
         { name: "Painter", value: 972, emoji: "🎨" },
+        { name: "Galaxy Necklace", value: 650, emoji: "📿" },
+        { name: "Anubis Boat", value: 570, emoji: "⛵" },
+        { name: "Aquarium Jar", value: 568, emoji: "🐠" },
+        { name: "Butterfly Gift", value: 432, emoji: "🦋" },
+        { name: "2025 Cake", value: 333, emoji: "🎂" },
         { name: "Nothing", value: 0, emoji: "❌" }
     ],
     599: [
@@ -81,6 +101,15 @@ const slotPools = {
         { name: "Luxury Bag", value: 15933, emoji: "👜" },
         { name: "Kiss Frog", value: 6831, emoji: "🐸" },
         { name: "Purple Bear", value: 4290, emoji: "🧸" },
+        { name: "Heart Bottle", value: 1541, emoji: "💙" },
+        { name: "Balloon Dog", value: 1014, emoji: "🎈" },
+        { name: "Danger Ticket", value: 737, emoji: "🎟️" },
+        { name: "Angel Box", value: 591, emoji: "🎁" },
+        { name: "Blue Potion", value: 580, emoji: "🧪" },
+        { name: "Mosque Moon", value: 527, emoji: "🌙" },
+        { name: "You Heart", value: 494, emoji: "💖" },
+        { name: "Black Sheep", value: 326, emoji: "🐏" },
+        { name: "Magic Portal", value: 316, emoji: "🌀" },
         { name: "Nothing", value: 0, emoji: "❌" }
     ],
     1099: [
@@ -88,6 +117,19 @@ const slotPools = {
         { name: "Purple Crystal", value: 9796, emoji: "🔮" },
         { name: "Lucky Cat", value: 8948, emoji: "🐱" },
         { name: "Vintage Car", value: 5773, emoji: "🚗" },
+        { name: "Rainbow Creature", value: 5350, emoji: "🌈" },
+        { name: "Cigar", value: 4612, emoji: "🚬" },
+        { name: "Purple Bear", value: 4290, emoji: "🧸" },
+        { name: "Green Ring", value: 3659, emoji: "💍" },
+        { name: "Rose Frame", value: 3086, emoji: "🌹" },
+        { name: "Megaphone", value: 1956, emoji: "📣" },
+        { name: "Strawberry", value: 1391, emoji: "🍓" },
+        { name: "Balloon Dog", value: 1014, emoji: "🎈" },
+        { name: "Painter", value: 972, emoji: "🎨" },
+        { name: "Angel Bunny", value: 908, emoji: "🐰" },
+        { name: "Angel Box", value: 591, emoji: "🎁" },
+        { name: "Anubis Boat", value: 570, emoji: "⛵" },
+        { name: "Aquarium Jar", value: 568, emoji: "🐠" },
         { name: "Nothing", value: 0, emoji: "❌" }
     ]
 };
@@ -141,9 +183,7 @@ function renderLive() {
 }
 
 function renderHome() {
-    const homeScreen = document.getElementById("home-screen");
-
-    homeScreen.innerHTML = `
+    document.getElementById("home-screen").innerHTML = `
         <div class="page-shell">
             <div class="game-list">
                 ${modes.map(renderModeCard).join("")}
@@ -164,7 +204,6 @@ function renderModeCard(mode) {
                     <h2>${mode.title}</h2>
                     <p>${mode.subtitle}</p>
                 </div>
-
                 <div class="game-art">
                     ${renderCardArt(mode.art)}
                 </div>
@@ -174,69 +213,36 @@ function renderModeCard(mode) {
 }
 
 function renderCardArt(type) {
-    if (type === "free") {
-        return `<div class="chest-fire"></div><div class="ares-chest"></div>`;
-    }
-
-    if (type === "roulette") {
-        return `<div class="roulette-wheel"></div><div class="roulette-ball"></div>`;
-    }
-
+    if (type === "free") return `<div class="chest-fire"></div><div class="ares-chest"></div>`;
+    if (type === "roulette") return `<div class="roulette-wheel"></div><div class="roulette-ball"></div>`;
     if (type === "pvp") {
-    return `
-        <div class="pvp-banner">
-            <div class="pvp-warrior left">
-                <div class="helmet"></div>
-                <div class="body"></div>
-                <div class="shield"></div>
-                <div class="sword"></div>
+        return `
+            <div class="pvp-banner">
+                <div class="pvp-arena"></div>
+                <div class="pvp-warrior-final left">
+                    <div class="crest"></div><div class="helmet"></div><div class="body"></div><div class="shield"></div><div class="sword"></div>
+                </div>
+                <div class="pvp-warrior-final right">
+                    <div class="crest"></div><div class="helmet"></div><div class="body"></div><div class="shield"></div><div class="sword"></div>
+                </div>
+                <div class="pvp-clash"></div>
             </div>
-
-            <div class="pvp-warrior right">
-                <div class="helmet"></div>
-                <div class="body"></div>
-                <div class="shield"></div>
-                <div class="sword"></div>
-            </div>
-
-            <div class="arena-fire"></div>
-        </div>
-    `;
-}
-
+        `;
+    }
     if (type === "crash") {
         return `
-            <div class="crash-ares">
-                <div class="ares-helmet"></div>
-                <div class="ares-body"></div>
-                <div class="spear"></div>
-            </div>
+            <div class="crash-ares"><div class="ares-helmet"></div><div class="ares-body"></div><div class="spear"></div></div>
             <div class="crash-curve"></div>
         `;
     }
-
-    if (type === "slots") {
-        return `
-            <div class="zeus-bolt">⚡</div>
-            <div class="olympus-logo">GATES</div>
-            <div class="olympus-gate"></div>
-        `;
-    }
-
-    if (type === "eggs") {
-        return `<div class="fire-egg"></div>`;
-    }
-
-    if (type === "upgrade") {
-        return `<div class="penguin"></div><div class="portal"></div>`;
-    }
-
+    if (type === "slots") return `<div class="zeus-bolt">⚡</div><div class="olympus-logo">GATES</div><div class="olympus-gate"></div>`;
+    if (type === "eggs") return `<div class="fire-egg"></div>`;
+    if (type === "upgrade") return `<div class="penguin"></div><div class="portal"></div>`;
     return `<span>🎁</span>`;
 }
 
 function openMode(modeId) {
     currentMode = modeId;
-
     if (modeId === "free") renderFreeCase();
     if (modeId === "roulette") renderRoulette();
     if (modeId === "pvp") renderPvP();
@@ -260,57 +266,50 @@ function modeHeader(title, subtitle) {
 }
 
 function renderFreeCase() {
+    currentMode = "free";
     document.getElementById("home-screen").innerHTML = `
         <div class="page-shell">
             ${modeHeader("Free Case", "10 tickets • RTP 5%")}
-
             <div class="roulette-window">
                 <div class="roulette-pointer"></div>
                 <div class="roulette-track" id="rouletteTrack">
                     ${buildReel(mainPrizes, 14).map(renderRouletteItem).join("")}
                 </div>
             </div>
-
-            <div class="case-preview-grid">
-                ${mainPrizes.slice(0, 9).map(renderPreviewCard).join("")}
-            </div>
-
+            <div class="case-preview-grid">${mainPrizes.slice(0, 9).map(renderPreviewCard).join("")}</div>
             <button class="primary-btn" onclick="spinFreeCase()">Open • 🎟️ 10</button>
         </div>
     `;
 }
 
 function renderRoulette() {
+    currentMode = "roulette";
     document.getElementById("home-screen").innerHTML = `
         <div class="page-shell">
             ${modeHeader("Roulette", "Classic Ares spin")}
-
             <div class="roulette-window">
                 <div class="roulette-pointer"></div>
                 <div class="roulette-track" id="rouletteTrack">
                     ${buildReel(mainPrizes, 14).map(renderRouletteItem).join("")}
                 </div>
             </div>
-
             <div class="secondary-row">
                 <button class="secondary-btn" onclick="toggleDemo()">Demo: ${demoMode ? "ON" : "OFF"}</button>
                 <button class="secondary-btn" onclick="openPrizesModal()">Prizes</button>
             </div>
-
             <button class="primary-btn" onclick="spinRoulette()">Spin • ⭐ 15</button>
         </div>
     `;
 }
 
 function renderPvP() {
+    currentMode = "pvp";
     document.getElementById("home-screen").innerHTML = `
         <div class="page-shell">
             ${modeHeader("PvP Arena", "Wheel battle")}
-
             <div class="mode-card">
                 <div class="pvp-pointer"></div>
                 <div class="pvp-wheel" id="pvpWheel"></div>
-
                 <div class="pvp-player-list">
                     ${["Areszer", "Titan", "Ghost"].map((name, index) => `
                         <div class="pvp-player">
@@ -324,61 +323,47 @@ function renderPvP() {
                     `).join("")}
                 </div>
             </div>
-
             <button class="primary-btn" onclick="startPvP()">Start Battle • ⭐ 20</button>
         </div>
     `;
 }
 
 function renderCrash() {
+    currentMode = "crash";
     document.getElementById("home-screen").innerHTML = `
         <div class="page-shell">
             ${modeHeader("Crash", "Ares spear multiplier")}
-
             <div class="crash-scene">
                 <div class="crash-stars"></div>
-                <div class="crash-character">
-                    <div class="ares-helmet"></div>
-                    <div class="ares-body"></div>
-                    <div class="spear"></div>
-                </div>
+                <div class="crash-character"><div class="ares-helmet"></div><div class="ares-body"></div><div class="spear"></div></div>
                 <div class="crash-main-value" id="crashValue">1.00x</div>
             </div>
-
-            <div class="multiplier-row" id="multiplierRow">
-                ${["1.20x", "1.54x", "2.10x", "3.40x", "5.60x"].map((x) => `<div class="multiplier-pill">${x}</div>`).join("")}
-            </div>
-
+            <div class="multiplier-row">${["1.23x", "1.41x", "2.15x", "3.26x", "5.49x"].map((x) => `<div class="multiplier-pill">${x}</div>`).join("")}</div>
             <div class="crash-bet-list">
                 ${["areszers", "warrior", "sparta", "ghost"].map((name, i) => `
                     <div class="crash-player">
                         <div class="avatar">${name[0].toUpperCase()}</div>
-                        <div>
-                            <div class="player-name">${name}</div>
-                            <div class="player-meta">Bet ⭐ ${(i + 1) * 25}</div>
-                        </div>
+                        <div><div class="player-name">${name}</div><div class="player-meta">Bet ⭐ ${(i + 1) * 25}</div></div>
                         <div class="player-prize">x${(1.2 + i / 2).toFixed(2)}</div>
                     </div>
                 `).join("")}
             </div>
-
             <div class="secondary-row">
                 <button class="secondary-btn" onclick="cashoutCrash()">Cashout</button>
                 <button class="secondary-btn" onclick="fakeToast('Auto cashout set')">Auto</button>
             </div>
-
             <button class="primary-btn" onclick="startCrash()">Launch Spear • ⭐ 25</button>
         </div>
     `;
 }
 
 function renderSlots() {
+    currentMode = "slots";
     const bets = [49, 129, 299, 599, 1099];
 
     document.getElementById("home-screen").innerHTML = `
         <div class="page-shell">
             ${modeHeader("Slots", "Olympus reels • RTP 10%")}
-
             <div class="slots-machine">
                 <div class="slot-reels">
                     ${[0, 1, 2].map((i) => `
@@ -390,29 +375,27 @@ function renderSlots() {
                     `).join("")}
                 </div>
             </div>
-
             <div class="bet-row">
-                ${bets.map((bet) => `
-                    <button class="bet-pill ${bet === selectedSlotBet ? "active" : ""}" onclick="selectSlotBet(${bet})">⭐ ${bet}</button>
-                `).join("")}
+                ${bets.map((bet) => `<button class="bet-pill ${bet === selectedSlotBet ? "active" : ""}" onclick="selectSlotBet(${bet})">⭐ ${bet}</button>`).join("")}
             </div>
-
+            <div class="secondary-row">
+                <button class="secondary-btn" onclick="openSlotPrizes()">Prizes</button>
+                <button class="secondary-btn" onclick="fakeToast('Settings ready')">Settings</button>
+            </div>
             <button class="primary-btn" onclick="spinSlots()">Spin • ⭐ ${selectedSlotBet}</button>
         </div>
     `;
 }
 
 function renderEggs() {
+    currentMode = "eggs";
     document.getElementById("home-screen").innerHTML = `
         <div class="page-shell">
             ${modeHeader("Eggs", "Ares relic chests")}
-
             <div class="egg-grid">
                 ${eggTiers.map((egg) => `
                     <button class="egg-card" onclick="selectEgg('${egg.id}')">
-                        <div class="egg-art">
-                            <div class="fire-egg"></div>
-                        </div>
+                        <div class="egg-art"><div class="fire-egg"></div></div>
                         <div class="egg-info">
                             <h3>${egg.icon} ${egg.label}</h3>
                             <span class="winwin">RTP ${egg.rtp}%</span>
@@ -426,28 +409,16 @@ function renderEggs() {
 }
 
 function renderUpgrade() {
+    currentMode = "upgrade";
     document.getElementById("home-screen").innerHTML = `
         <div class="page-shell">
             ${modeHeader("Forge of Ares", "Upgrade RTP 10%")}
-
             <div class="mode-card">
                 <div class="upgrade-panel">
-                    <div class="upgrade-box">
-                        <div class="add-box">
-                            <strong>+</strong>
-                            <small>Your gifts</small>
-                        </div>
-                    </div>
-
-                    <div class="upgrade-box">
-                        <div class="add-box">
-                            <strong>?</strong>
-                            <small>Desired gift</small>
-                        </div>
-                    </div>
+                    <div class="upgrade-box"><div class="add-box"><strong>+</strong><small>Your gifts</small></div></div>
+                    <div class="upgrade-box"><div class="add-box"><strong>?</strong><small>Desired gift</small></div></div>
                 </div>
             </div>
-
             <button class="primary-btn" onclick="startUpgrade()">Forge Upgrade</button>
         </div>
     `;
@@ -492,6 +463,10 @@ function spinGeneric(pool, title, rtp) {
 
 function startPvP() {
     if (isBusy) return;
+    if (stars < 20) return fakeToast("Not enough stars");
+
+    stars -= 20;
+    updateBalances();
     isBusy = true;
 
     const wheel = document.getElementById("pvpWheel");
@@ -502,9 +477,6 @@ function startPvP() {
         fakeToast("Arena winner: areszers");
     }, 3700);
 }
-
-let crashTimer = null;
-let crashCurrent = 1;
 
 function startCrash() {
     if (isBusy) return;
@@ -570,8 +542,9 @@ function spinSlots() {
     }
 
     setTimeout(() => {
+        const pool = slotPools[selectedSlotBet];
         const result = Math.random() <= 0.10
-            ? randomFrom(slotPools[selectedSlotBet].filter((x) => x.value > 0))
+            ? randomFrom(pool.filter((x) => x.value > 0))
             : { name: "Nothing", value: 0, emoji: "❌" };
 
         if (result.value > 0) {
@@ -591,7 +564,6 @@ function spinSlots() {
 function selectEgg(id) {
     selectedEggTier = eggTiers.find((x) => x.id === id);
     if (!selectedEggTier) return;
-
     if (stars < selectedEggTier.price) return fakeToast("Not enough stars");
 
     stars -= selectedEggTier.price;
@@ -607,6 +579,7 @@ function selectEgg(id) {
 function startUpgrade() {
     if (inventory.length === 0) return fakeToast("No gifts to upgrade");
 
+    const burned = inventory.shift();
     const success = Math.random() <= 0.10;
 
     if (success) {
@@ -615,16 +588,15 @@ function startUpgrade() {
         fakeToast("Forge success");
         showReward(prize, "Forge of Ares");
     } else {
-        inventory.shift();
         renderProfile();
-        fakeToast("Forge failed. Gift burned.");
+        fakeToast(`${burned.name} burned`);
     }
 }
 
 function showReward(prize, title) {
     isBusy = false;
 
-    if (prize.value > 0 && prize.rarity !== "Bonus" && prize.name !== "Nothing" && !demoMode) {
+    if (prize.value > 0 && prize.rarity !== "Bonus" && prize.name !== "Nothing" && prize.name !== "Ash Relic" && !demoMode) {
         inventory.unshift(prize);
     }
 
@@ -639,14 +611,10 @@ function showReward(prize, title) {
         <div class="page-shell">
             <div class="reward-screen">
                 <div class="reward-card">
-                    <div class="reward-art">
-                        <span>${prize.emoji || "🎁"}</span>
-                    </div>
-
+                    <div class="reward-art"><span>${prize.emoji || "🎁"}</span></div>
                     <h2>${prize.name}</h2>
                     <p>${title} • ⭐ ${prize.value.toLocaleString()}</p>
-
-                    <button class="claim-btn primary-btn" onclick="openMode('${currentMode || "free"}')">Back</button>
+                    <button class="primary-btn" onclick="openMode('${currentMode || "free"}')">Back</button>
                 </div>
             </div>
         </div>
@@ -654,22 +622,11 @@ function showReward(prize, title) {
 }
 
 function renderRouletteItem(item) {
-    return `
-        <div class="roulette-item">
-            <span>${item.emoji || "🎁"}</span>
-            <small>${item.name}</small>
-        </div>
-    `;
+    return `<div class="roulette-item"><span>${item.emoji || "🎁"}</span><small>${item.name}</small></div>`;
 }
 
 function renderPreviewCard(item) {
-    return `
-        <div class="preview-card">
-            <span>${item.emoji || "🎁"}</span>
-            <strong>⭐ ${item.value.toLocaleString()}</strong>
-            <small>${item.name}</small>
-        </div>
-    `;
+    return `<div class="preview-card"><span>${item.emoji || "🎁"}</span><strong>⭐ ${item.value.toLocaleString()}</strong><small>${item.name}</small></div>`;
 }
 
 function buildReel(pool, count) {
@@ -687,11 +644,7 @@ function buildSlotStrip() {
 
 function pickPrizeByRtp(pool, rtp) {
     const hit = Math.random() <= rtp / 100;
-
-    if (!hit) {
-        return randomFrom(pool.filter((x) => x.rarity === "Bonus" || x.value <= 50));
-    }
-
+    if (!hit) return randomFrom(pool.filter((x) => x.rarity === "Bonus" || x.value <= 50));
     return randomFrom(pool.filter((x) => x.value > 50));
 }
 
@@ -708,29 +661,17 @@ function toggleDemo() {
 function renderTasks() {
     document.getElementById("tasks-screen").innerHTML = `
         <div class="page-title">War Missions</div>
-
         <div class="task-list">
             <div class="task-card">
-                <div>
-                    <h3>Share Invite Link</h3>
-                    <p>Reward: 🎟️ 5 tickets</p>
-                </div>
+                <div><h3>Share Invite Link</h3><p>Reward: 🎟️ 5 tickets</p></div>
                 <button onclick="claimTask('link')">GO</button>
             </div>
-
             <div class="task-card">
-                <div>
-                    <h3>Share Story</h3>
-                    <p>Reward: 🎟️ 10 tickets</p>
-                </div>
+                <div><h3>Share Story</h3><p>Reward: 🎟️ 10 tickets</p></div>
                 <button onclick="claimTask('story')">GO</button>
             </div>
-
             <div class="task-card">
-                <div>
-                    <h3>Ares Chat Activity</h3>
-                    <p>Send at least 5 messages</p>
-                </div>
+                <div><h3>Ares Chat Activity</h3><p>Send at least 5 messages</p></div>
                 <button onclick="claimTask('chat')">CLAIM</button>
             </div>
         </div>
@@ -741,7 +682,6 @@ function claimTask(type) {
     if (type === "link") tickets += 5;
     if (type === "story") tickets += 10;
     if (type === "chat") tickets += 15;
-
     updateBalances();
     fakeToast("Mission reward claimed");
 }
@@ -749,17 +689,14 @@ function claimTask(type) {
 function renderRaffles() {
     document.getElementById("raffles-screen").innerHTML = `
         <div class="page-title">Daily Free Prizes</div>
-
         <div class="raffle-card">
             <div class="raffle-top">
                 <span>🎁 Free spin requirements</span>
                 <span>RTP 3%</span>
             </div>
-
             <p style="opacity:.75;line-height:1.5;margin-bottom:16px;">
                 Send invite message to friends, share story, and send at least 5 messages in Ares Chat.
             </p>
-
             <button class="join-btn" onclick="fakeToast('Daily free spin check started')">CHECK TASKS</button>
         </div>
     `;
@@ -768,7 +705,6 @@ function renderRaffles() {
 function renderArenaRankings() {
     document.getElementById("leaderboard-screen").innerHTML = `
         <div class="page-title">Arena Rankings</div>
-
         <div class="leaderboard-list">
             ${[
                 ["#1", "areszers", "125.000"],
@@ -795,19 +731,10 @@ function renderProfile() {
             <div class="referral-box">
                 <h2>Recruit Warriors <span>25%</span></h2>
                 <p style="opacity:.7;margin-top:8px;">Earn 25% from invited warriors.</p>
-
                 <div class="ref-row">
-                    <div class="ref-stat">
-                        <h3>12</h3>
-                        <p>Invited</p>
-                    </div>
-
-                    <div class="ref-stat">
-                        <h3>⭐ 2,450</h3>
-                        <p>Earned</p>
-                    </div>
+                    <div class="ref-stat"><h3>12</h3><p>Invited</p></div>
+                    <div class="ref-stat"><h3>⭐ 2,450</h3><p>Earned</p></div>
                 </div>
-
                 <button class="primary-btn" onclick="copyInvite()">Invite</button>
             </div>
 
@@ -816,30 +743,14 @@ function renderProfile() {
             <p>ID: ${user.id}</p>
 
             <div class="profile-stats">
-                <div class="stat-box">
-                    <h3>${stars.toLocaleString()}</h3>
-                    <p>Stars</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3>${tickets}</h3>
-                    <p>Tickets</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3>${inventory.length}</h3>
-                    <p>Gifts</p>
-                </div>
-
-                <div class="stat-box">
-                    <h3>${demoMode ? "ON" : "OFF"}</h3>
-                    <p>Demo</p>
-                </div>
+                <div class="stat-box"><h3>${stars.toLocaleString()}</h3><p>Stars</p></div>
+                <div class="stat-box"><h3>${tickets}</h3><p>Tickets</p></div>
+                <div class="stat-box"><h3>${inventory.length}</h3><p>Gifts</p></div>
+                <div class="stat-box"><h3>${demoMode ? "ON" : "OFF"}</h3><p>Demo</p></div>
             </div>
 
             <div class="inventory-section">
                 <h3 class="inventory-title">Your Gifts</h3>
-
                 <div class="inventory-list">
                     ${
                         inventory.length === 0
@@ -862,7 +773,6 @@ function renderProfile() {
 
 function copyInvite() {
     const link = `https://t.me/ares_case_bot?start=${user.id}`;
-
     navigator.clipboard?.writeText(link);
     fakeToast("Invite link copied");
 }
@@ -882,19 +792,42 @@ function openPrizesModal() {
         <div class="modal-box">
             <button class="modal-close" onclick="closeModal()">×</button>
             <div class="modal-title">Possible Prizes</div>
-
             <div class="prize-grid">
                 ${mainPrizes.map((item) => `
                     <div class="prize-card">
-                        <div class="prize-icon">
-                            <span>${item.emoji || "🎁"}</span>
-                        </div>
+                        <div class="prize-icon"><span>${item.emoji || "🎁"}</span></div>
                         <div class="prize-price">⭐ ${item.value.toLocaleString()}</div>
                         <div class="prize-name">${item.name}</div>
                     </div>
                 `).join("")}
             </div>
+            <button class="modal-bottom-btn" onclick="closeModal()">Close</button>
+        </div>
+    `;
 
+    document.body.appendChild(modal);
+}
+
+function openSlotPrizes() {
+    closeModal();
+
+    const pool = slotPools[selectedSlotBet] || slotPools[49];
+    const modal = document.createElement("div");
+    modal.className = "modal-backdrop";
+
+    modal.innerHTML = `
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-title">Slots Prizes • ⭐ ${selectedSlotBet}</div>
+            <div class="prize-grid">
+                ${pool.map((item) => `
+                    <div class="prize-card">
+                        <div class="prize-icon"><span>${item.emoji || "🎁"}</span></div>
+                        <div class="prize-price">${item.value > 0 ? `⭐ ${item.value.toLocaleString()}` : "Nothing"}</div>
+                        <div class="prize-name">${item.name}</div>
+                    </div>
+                `).join("")}
+            </div>
             <button class="modal-bottom-btn" onclick="closeModal()">Close</button>
         </div>
     `;
@@ -916,7 +849,6 @@ function fakeToast(message) {
     document.body.appendChild(toast);
 
     setTimeout(() => toast.classList.add("show"), 50);
-
     setTimeout(() => {
         toast.classList.remove("show");
         setTimeout(() => toast.remove(), 300);
@@ -925,18 +857,13 @@ function fakeToast(message) {
 
 function startLiveScroll() {
     const liveTrack = document.getElementById("liveTrack");
-
     if (!liveTrack) return;
 
     let scrollPos = 0;
 
     setInterval(() => {
         scrollPos += 1;
-
-        liveTrack.scrollTo({
-            left: scrollPos,
-            behavior: "smooth"
-        });
+        liveTrack.scrollTo({ left: scrollPos, behavior: "smooth" });
 
         if (scrollPos > liveTrack.scrollWidth / 2) {
             scrollPos = 0;
