@@ -3,8 +3,8 @@ const tg = window.Telegram?.WebApp;
 if (tg) {
     tg.ready();
     tg.expand();
-    tg.setHeaderColor("#071124");
-    tg.setBackgroundColor("#071124");
+    tg.setHeaderColor("#060b16");
+    tg.setBackgroundColor("#060b16");
 }
 
 const user = tg?.initDataUnsafe?.user || {
@@ -13,65 +13,306 @@ const user = tg?.initDataUnsafe?.user || {
     username: "areszers"
 };
 
-const navButtons = document.querySelectorAll(".nav-btn");
 const screens = document.querySelectorAll(".screen");
+const navButtons = document.querySelectorAll(".nav-btn");
 
-let balance = 35;
+let stars = 35;
 let tickets = 2;
-let inventory = [];
 let demoMode = true;
-let currentCaseName = "Free Case";
-let currentCaseOpening = false;
+let inventory = [];
+let currentCase = null;
+let isSpinning = false;
+
+const liveItems = [
+    "https://storage.portal-market.com/portals-market/gifts/faithamulet/models/png/bronzetower.png",
+    "https://storage.portal-market.com/portals-market/gifts/hangingstar/models/png/advicedog.png",
+    "https://storage.portal-market.com/portals-market/gifts/ionicdryer/models/png/barbiecore.png",
+    "https://storage.portal-market.com/portals-market/gifts/vicecream/models/png/pumpkinspice.png",
+    "https://storage.portal-market.com/portals-market/gifts/nekohelmet/models/png/acidpunch.png",
+    "https://storage.portal-market.com/portals-market/gifts/restlessjar/models/png/aquarium.png",
+    "https://storage.portal-market.com/portals-market/gifts/berrybox/models/png/alpha.png",
+    "https://storage.portal-market.com/portals-market/gifts/victorymedal/models/png/aegis.png",
+    "https://storage.portal-market.com/portals-market/gifts/bunnymuffin/models/png/airysouffle.png",
+    "https://storage.portal-market.com/portals-market/gifts/lolpop/models/png/andromeda.png",
+    "https://storage.portal-market.com/portals-market/gifts/moussecake/models/png/butterflies.png",
+    "https://storage.portal-market.com/portals-market/gifts/cookieheart/models/png/affection.png",
+    "https://storage.portal-market.com/portals-market/gifts/cupidcharm/models/png/bloodgem.png",
+    "https://storage.portal-market.com/portals-market/gifts/jollychimp/models/png/artist.png",
+    "https://storage.portal-market.com/portals-market/gifts/toybear/models/png/alterego.png",
+    "https://storage.portal-market.com/portals-market/gifts/bowtie/models/png/babyyoda.png",
+    "https://storage.portal-market.com/portals-market/gifts/lovecandle/models/png/afterglow.png",
+    "https://storage.portal-market.com/portals-market/gifts/instantramen/models/png/arcanebowl.png",
+    "https://storage.portal-market.com/portals-market/gifts/lushbouquet/models/png/artichoke.png",
+    "https://storage.portal-market.com/portals-market/gifts/westsidesign/models/png/allin.png"
+];
 
 const prizes = [
-    { icon: "🐒", name: "Monkey", value: 19044, rarity: "Mythic", weight: 1 },
-    { icon: "🦾", name: "Robot Arm", value: 17969, rarity: "Mythic", weight: 1 },
-    { icon: "👜", name: "Luxury Bag", value: 15536, rarity: "Legendary", weight: 2 },
-    { icon: "💼", name: "Blue Case", value: 3727, rarity: "Epic", weight: 5 },
-    { icon: "💍", name: "Green Ring", value: 3153, rarity: "Epic", weight: 5 },
-    { icon: "📣", name: "Megaphone", value: 1876, rarity: "Rare", weight: 10 },
-    { icon: "🎃", name: "Pumpkin", value: 1288, rarity: "Rare", weight: 10 },
-    { icon: "🌼", name: "White Flower", value: 1154, rarity: "Rare", weight: 10 },
-    { icon: "🎨", name: "Painter", value: 966, rarity: "Rare", weight: 10 },
-    { icon: "🧪", name: "Laser Sword", value: 593, rarity: "Common", weight: 18 },
-    { icon: "💸", name: "Money Bag", value: 576, rarity: "Common", weight: 18 },
-    { icon: "🎈", name: "Balloon", value: 432, rarity: "Common", weight: 20 },
-    { icon: "🐟", name: "Fish Tank", value: 347, rarity: "Common", weight: 22 },
-    { icon: "🥭", name: "Jungle Case", value: 343, rarity: "Common", weight: 22 },
-    { icon: "🍌", name: "Banana", value: 339, rarity: "Common", weight: 22 },
-    { icon: "🌀", name: "Magic Portal", value: 327, rarity: "Common", weight: 22 },
-    { icon: "🦊", name: "Fox Toy", value: 322, rarity: "Common", weight: 22 },
-    { icon: "⭐", name: "100 Stars", value: 100, rarity: "Bonus", weight: 14 },
-    { icon: "⭐", name: "75 Stars", value: 75, rarity: "Bonus", weight: 16 },
-    { icon: "⭐", name: "50 Stars", value: 50, rarity: "Bonus", weight: 18 },
-    { icon: "⭐", name: "25 Stars", value: 25, rarity: "Bonus", weight: 20 },
-    { icon: "⭐", name: "15 Stars", value: 15, rarity: "Bonus", weight: 22 },
-    { icon: "⭐", name: "10 Stars", value: 10, rarity: "Bonus", weight: 25 },
-    { icon: "⭐", name: "5 Stars", value: 5, rarity: "Bonus", weight: 30 }
+    {
+        id: "p1",
+        name: "Jolly Chimp",
+        rarity: "Mythic",
+        value: 19044,
+        weight: 1,
+        image: "https://storage.portal-market.com/portals-market/gifts/jollychimp/models/png/artist.png"
+    },
+    {
+        id: "p2",
+        name: "Ion Dryer",
+        rarity: "Mythic",
+        value: 17969,
+        weight: 1,
+        image: "https://storage.portal-market.com/portals-market/gifts/ionicdryer/models/png/barbiecore.png"
+    },
+    {
+        id: "p3",
+        name: "Luxury Bag",
+        rarity: "Legendary",
+        value: 15536,
+        weight: 2,
+        image: "https://storage.portal-market.com/portals-market/gifts/berrybox/models/png/alpha.png"
+    },
+    {
+        id: "p4",
+        name: "Blue Case",
+        rarity: "Epic",
+        value: 3727,
+        weight: 5,
+        image: "https://storage.portal-market.com/portals-market/gifts/restlessjar/models/png/aquarium.png"
+    },
+    {
+        id: "p5",
+        name: "Green Ring",
+        rarity: "Epic",
+        value: 3153,
+        weight: 5,
+        image: "https://storage.portal-market.com/portals-market/gifts/moonpendant/models/png/azurite.png"
+    },
+    {
+        id: "p6",
+        name: "Megaphone",
+        rarity: "Rare",
+        value: 1876,
+        weight: 10,
+        image: "https://storage.portal-market.com/portals-market/gifts/faithamulet/models/png/bronzetower.png"
+    },
+    {
+        id: "p7",
+        name: "Pumpkin Spice",
+        rarity: "Rare",
+        value: 1288,
+        weight: 10,
+        image: "https://storage.portal-market.com/portals-market/gifts/vicecream/models/png/pumpkinspice.png"
+    },
+    {
+        id: "p8",
+        name: "White Flower",
+        rarity: "Rare",
+        value: 1154,
+        weight: 10,
+        image: "https://storage.portal-market.com/portals-market/gifts/lushbouquet/models/png/artichoke.png"
+    },
+    {
+        id: "p9",
+        name: "Painter",
+        rarity: "Rare",
+        value: 966,
+        weight: 10,
+        image: "https://storage.portal-market.com/portals-market/gifts/hangingstar/models/png/advicedog.png"
+    },
+    {
+        id: "p10",
+        name: "Light Sword",
+        rarity: "Common",
+        value: 593,
+        weight: 18,
+        image: "https://storage.portal-market.com/portals-market/gifts/lightsword/models/png/absinthe.png"
+    },
+    {
+        id: "p11",
+        name: "Money Bag",
+        rarity: "Common",
+        value: 576,
+        weight: 18,
+        image: "https://storage.portal-market.com/portals-market/gifts/westsidesign/models/png/allin.png"
+    },
+    {
+        id: "p12",
+        name: "Balloon",
+        rarity: "Common",
+        value: 432,
+        weight: 20,
+        image: "https://storage.portal-market.com/portals-market/gifts/candycane/models/png/amberglitter.png"
+    },
+    {
+        id: "p13",
+        name: "Fish Tank",
+        rarity: "Common",
+        value: 347,
+        weight: 22,
+        image: "https://storage.portal-market.com/portals-market/gifts/petsnake/models/png/albino.png"
+    },
+    {
+        id: "p14",
+        name: "Jungle Case",
+        rarity: "Common",
+        value: 343,
+        weight: 22,
+        image: "https://storage.portal-market.com/portals-market/gifts/nekohelmet/models/png/acidpunch.png"
+    },
+    {
+        id: "p15",
+        name: "Banana",
+        rarity: "Common",
+        value: 339,
+        weight: 22,
+        image: "https://storage.portal-market.com/portals-market/gifts/bunnymuffin/models/png/airysouffle.png"
+    },
+    {
+        id: "p16",
+        name: "Magic Portal",
+        rarity: "Common",
+        value: 327,
+        weight: 22,
+        image: "https://storage.portal-market.com/portals-market/gifts/cupidcharm/models/png/bloodgem.png"
+    },
+    {
+        id: "p17",
+        name: "Fox Toy",
+        rarity: "Common",
+        value: 322,
+        weight: 22,
+        image: "https://storage.portal-market.com/portals-market/gifts/toybear/models/png/alterego.png"
+    },
+    {
+        id: "p18",
+        name: "100 Stars",
+        rarity: "Bonus",
+        value: 100,
+        weight: 14,
+        emoji: "⭐"
+    },
+    {
+        id: "p19",
+        name: "75 Stars",
+        rarity: "Bonus",
+        value: 75,
+        weight: 16,
+        emoji: "⭐"
+    },
+    {
+        id: "p20",
+        name: "50 Stars",
+        rarity: "Bonus",
+        value: 50,
+        weight: 18,
+        emoji: "⭐"
+    },
+    {
+        id: "p21",
+        name: "25 Stars",
+        rarity: "Bonus",
+        value: 25,
+        weight: 20,
+        emoji: "⭐"
+    },
+    {
+        id: "p22",
+        name: "15 Stars",
+        rarity: "Bonus",
+        value: 15,
+        weight: 22,
+        emoji: "⭐"
+    },
+    {
+        id: "p23",
+        name: "10 Stars",
+        rarity: "Bonus",
+        value: 10,
+        weight: 25,
+        emoji: "⭐"
+    },
+    {
+        id: "p24",
+        name: "5 Stars",
+        rarity: "Bonus",
+        value: 5,
+        weight: 30,
+        emoji: "⭐"
+    }
 ];
 
 const cases = [
-    { name: "Free Case", title: "Free", subtitle: "2 cases", icon: "🎁", className: "gray", price: 0 },
-    { name: "Roulette", title: "Roulette", subtitle: "15 cases", icon: "⭐", className: "blue", price: 15 },
-    { name: "PvP", title: "PvP", subtitle: "Online", icon: "⚔️", className: "orange", price: 20 },
-    { name: "Crash", title: "Crash", subtitle: "Online", icon: "🚀", className: "dark", price: 25 },
-    { name: "Slots", title: "Slots", subtitle: "5 cases", icon: "🎰", className: "red", price: 10 },
-    { name: "Eggs", title: "Eggs", subtitle: "6 cases", icon: "🥚", className: "green", price: 8 },
-    { name: "Upgrade", title: "Upgrade", subtitle: "Improve your gifts", icon: "⬆️", className: "purple", price: 0 }
+    {
+        id: "free",
+        title: "Free",
+        subtitle: "2 cases",
+        price: 0,
+        css: "card-free",
+        art: "🎁"
+    },
+    {
+        id: "roulette",
+        title: "Roulette",
+        subtitle: "15 cases",
+        price: 15,
+        css: "card-roulette",
+        art: "🎡"
+    },
+    {
+        id: "pvp",
+        title: "PvP",
+        subtitle: "Online",
+        price: 20,
+        css: "card-pvp",
+        art: "⚔️"
+    },
+    {
+        id: "crash",
+        title: "Crash",
+        subtitle: "Online",
+        price: 25,
+        css: "card-crash",
+        art: "🚀"
+    },
+    {
+        id: "slots",
+        title: "Slots",
+        subtitle: "5 cases",
+        price: 10,
+        css: "card-slots",
+        art: "🎰"
+    },
+    {
+        id: "eggs",
+        title: "Eggs",
+        subtitle: "6 cases",
+        price: 8,
+        css: "card-eggs",
+        art: "🥚"
+    },
+    {
+        id: "upgrade",
+        title: "Upgrade",
+        subtitle: "Improve your gifts",
+        price: 0,
+        css: "card-upgrade",
+        art: "⬆️"
+    }
 ];
 
 startApp();
 
 function startApp() {
+    renderLive();
     renderHome();
     renderTasks();
     renderRaffles();
     renderLeaderboard();
-    updateProfile();
-    updateBalance();
+    renderProfile();
+    updateBalances();
     bindNavigation();
     startLiveScroll();
-    fakeToast("Ares Mini App Loaded");
+    fakeToast("Ares Case loaded");
 }
 
 function bindNavigation() {
@@ -85,191 +326,274 @@ function bindNavigation() {
             screens.forEach((screen) => screen.classList.remove("active"));
             document.getElementById(target).classList.add("active");
 
-            if (target === "home-screen") {
-                renderHome();
-            }
-
-            if (target === "profile-screen") {
-                updateProfile();
-            }
+            if (target === "home-screen") renderHome();
+            if (target === "profile-screen") renderProfile();
         });
     });
+}
+
+function renderLive() {
+    const liveTrack = document.getElementById("liveTrack");
+
+    liveTrack.innerHTML = liveItems
+        .map((src) => {
+            return `
+                <div class="live-item">
+                    <img src="${src}" alt="">
+                </div>
+            `;
+        })
+        .join("");
 }
 
 function renderHome() {
     const homeScreen = document.getElementById("home-screen");
 
     homeScreen.innerHTML = `
-        <div class="game-list">
-            ${cases
-                .map(
-                    (caseItem) => `
-                        <div class="game-card ${caseItem.className}" data-case="${caseItem.name}">
-                            <div class="game-icon">${caseItem.icon}</div>
+        <div class="page-shell">
+            <div class="game-list">
+                ${cases
+                    .map(
+                        (caseItem) => `
+                            <button class="game-card ${caseItem.css}" data-case="${caseItem.id}">
+                                <div class="game-card-content">
+                                    <h2>${caseItem.title}</h2>
+                                    <p>${caseItem.subtitle}</p>
+                                </div>
 
-                            <div class="game-info">
-                                <h3>${caseItem.title}</h3>
-                                <p>${caseItem.subtitle}</p>
-                            </div>
-                        </div>
-                    `
-                )
-                .join("")}
+                                <div class="game-card-art">
+                                    <span>${caseItem.art}</span>
+                                </div>
+                            </button>
+                        `
+                    )
+                    .join("")}
+            </div>
         </div>
     `;
 
     document.querySelectorAll(".game-card").forEach((card) => {
         card.addEventListener("click", () => {
-            renderCasePage(card.dataset.case);
+            const caseItem = cases.find((item) => item.id === card.dataset.case);
+            currentCase = caseItem;
+            renderCasePage(caseItem);
         });
     });
 }
 
-function renderCasePage(caseName) {
-    currentCaseName = caseName;
+function renderCasePage(caseItem) {
+    currentCase = caseItem;
 
-    const selectedCase = cases.find((caseItem) => caseItem.name === caseName) || cases[0];
     const homeScreen = document.getElementById("home-screen");
-    const previewItems = [...prizes].sort((a, b) => b.value - a.value).slice(0, 10);
+    const topPrizes = [...prizes].sort((a, b) => b.value - a.value).slice(0, 9);
 
     homeScreen.innerHTML = `
-        <div class="case-page">
-            <div class="case-header">
-                <button class="back-btn" id="backToCasesBtn">← Cases</button>
+        <div class="page-shell">
+            <div class="case-page">
+                <div class="case-top">
+                    <button class="back-btn" id="backBtn">←</button>
 
-                <div class="case-title">
-                    <h2>${selectedCase.title}</h2>
-                    <p>${selectedCase.price === 0 ? "Free spin available" : `Spin price: ⭐ ${selectedCase.price}`}</p>
+                    <div class="case-title">
+                        <h2>${caseItem.title}</h2>
+                        <p>${caseItem.price === 0 ? "Free case" : `Spin price: ⭐ ${caseItem.price}`}</p>
+                    </div>
+
+                    <button class="case-top-btn" id="settingsBtn">⚙️</button>
                 </div>
-            </div>
 
-            <div class="case-arrows">⌄</div>
+                <div class="roulette-window">
+                    <div class="roulette-pointer"></div>
+                    <div class="roulette-track" id="rouletteTrack">
+                        ${buildIdleReel()
+                            .map((item) => renderRouletteItem(item))
+                            .join("")}
+                    </div>
+                </div>
 
-            <div class="case-prize-row">
-                ${previewItems
-                    .map(
-                        (item) => `
-                            <div class="case-preview-item">
-                                <div class="case-preview-icon">${item.icon}</div>
-                                <div class="case-preview-price">⭐ ${item.value.toLocaleString()}</div>
-                            </div>
-                        `
-                    )
-                    .join("")}
-            </div>
+                <div class="case-preview-grid">
+                    ${topPrizes.map((item) => renderPreviewCard(item)).join("")}
+                </div>
 
-            <div class="case-arrows">⌃</div>
+                <div class="case-action-row">
+                    <button class="case-mini-btn" id="prizesBtn">🎁 Prizes</button>
+                    <button class="case-mini-btn" id="demoBtn">${demoMode ? "🟢 Demo ON" : "⚪ Demo OFF"}</button>
+                </div>
 
-            <div class="case-action-row">
-                <button class="case-mini-btn" id="settingsBtn">⚙️ Settings</button>
-                <button class="case-mini-btn" id="prizesBtn">🎁 Prizes</button>
-            </div>
+                <button class="spin-btn" id="spinBtn">
+                    ${demoMode ? "Spin Demo" : caseItem.price === 0 ? "Spin Free" : `Spin • ⭐ ${caseItem.price}`}
+                </button>
 
-            <button class="spin-btn" id="spinBtn">
-                ${demoMode ? "Spin Demo" : selectedCase.price === 0 ? "Spin Free" : `Spin • ⭐ ${selectedCase.price}`}
-            </button>
-
-            <div class="demo-note">
-                ${demoMode ? "Demo mode is active. Prizes will not be credited." : "Real mode active. Rewards will be added to inventory."}
+                <div class="demo-note">
+                    ${demoMode ? "Demo mode active. Prize preview only." : "Real mode active. Rewards go to inventory."}
+                </div>
             </div>
         </div>
     `;
 
-    document.getElementById("backToCasesBtn").addEventListener("click", renderHome);
+    document.getElementById("backBtn").addEventListener("click", renderHome);
     document.getElementById("settingsBtn").addEventListener("click", openSettingsModal);
     document.getElementById("prizesBtn").addEventListener("click", openPrizesModal);
-    document.getElementById("spinBtn").addEventListener("click", () => openCase(caseName));
+    document.getElementById("demoBtn").addEventListener("click", toggleDemoMode);
+    document.getElementById("spinBtn").addEventListener("click", () => spinCase(caseItem));
 }
 
-function openCase(caseName) {
-    if (currentCaseOpening) return;
-
-    const selectedCase = cases.find((caseItem) => caseItem.name === caseName) || cases[0];
-
-    if (!demoMode && selectedCase.price > 0 && balance < selectedCase.price) {
-        fakeToast("Insufficient stars.");
-        return;
-    }
-
-    if (!demoMode && selectedCase.price > 0) {
-        balance -= selectedCase.price;
-        updateBalance();
-    }
-
-    currentCaseOpening = true;
-
-    const reward = getWeightedPrize();
-    const reelItems = buildReelItems(reward);
-    const homeScreen = document.getElementById("home-screen");
-
-    homeScreen.innerHTML = `
-        <div class="case-opening-screen">
-            <div class="spinner-area">
-                <div class="spinner-track">
-                    ${reelItems.map((item) => `<div class="spinner-item">${item.icon}</div>`).join("")}
-                </div>
-            </div>
-
-            <div class="opening-status">Opening ${caseName}...</div>
-        </div>
-    `;
-
-    setTimeout(() => {
-        if (!demoMode) {
-            if (reward.rarity === "Bonus") {
-                balance += reward.value;
-            } else {
-                inventory.unshift(reward);
-            }
-        }
-
-        updateBalance();
-        updateProfile();
-
-        homeScreen.innerHTML = `
-            <div class="reward-screen">
-                <div class="reward-icon">${reward.icon}</div>
-                <h2>${reward.name}</h2>
-                <p>${reward.rarity} • ⭐ ${reward.value.toLocaleString()}</p>
-                <button class="claim-btn" id="claimRewardBtn">
-                    ${demoMode ? "BACK" : "CLAIM"}
-                </button>
-            </div>
-        `;
-
-        document.getElementById("claimRewardBtn").addEventListener("click", () => {
-            renderCasePage(caseName);
-        });
-
-        currentCaseOpening = false;
-    }, 3900);
-}
-
-function getWeightedPrize() {
-    const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
-    let random = Math.random() * totalWeight;
-
-    for (const prize of prizes) {
-        random -= prize.weight;
-
-        if (random <= 0) {
-            return prize;
-        }
-    }
-
-    return prizes[prizes.length - 1];
-}
-
-function buildReelItems(finalPrize) {
+function buildIdleReel() {
     const reel = [];
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 14; i++) {
+        reel.push(prizes[i % prizes.length]);
+    }
+
+    return reel;
+}
+
+function buildSpinReel(finalPrize) {
+    const reel = [];
+
+    for (let i = 0; i < 24; i++) {
         reel.push(prizes[Math.floor(Math.random() * prizes.length)]);
     }
 
     reel.push(finalPrize);
 
     return reel;
+}
+
+function renderRouletteItem(item) {
+    return `
+        <div class="roulette-item">
+            ${item.image ? `<img src="${item.image}" alt="">` : `<span>${item.emoji || "🎁"}</span>`}
+            <small>${item.name}</small>
+        </div>
+    `;
+}
+
+function renderPreviewCard(item) {
+    return `
+        <div class="preview-card">
+            ${item.image ? `<img src="${item.image}" alt="">` : `<span>${item.emoji || "🎁"}</span>`}
+            <strong>⭐ ${item.value.toLocaleString()}</strong>
+            <small>${item.name}</small>
+        </div>
+    `;
+}
+
+function spinCase(caseItem) {
+    if (isSpinning) return;
+
+    if (!demoMode && caseItem.price > 0 && stars < caseItem.price) {
+        fakeToast("Not enough stars");
+        return;
+    }
+
+    if (!demoMode && caseItem.price > 0) {
+        stars -= caseItem.price;
+        updateBalances();
+    }
+
+    isSpinning = true;
+
+    const finalPrize = getWeightedPrize();
+    const fakeResponse = createFakeSpinResponse(finalPrize);
+    const reel = buildSpinReel(finalPrize);
+    const rouletteTrack = document.getElementById("rouletteTrack");
+
+    rouletteTrack.style.transition = "none";
+    rouletteTrack.style.transform = "translateX(0px)";
+    rouletteTrack.innerHTML = reel.map((item) => renderRouletteItem(item)).join("");
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            rouletteTrack.style.transition = "transform 3.8s cubic-bezier(0.12, 0.82, 0.22, 1)";
+            rouletteTrack.style.transform = "translateX(-2320px)";
+        });
+    });
+
+    setTimeout(() => {
+        handleSpinResult(fakeResponse, finalPrize, caseItem);
+    }, 3900);
+}
+
+function createFakeSpinResponse(prize) {
+    return {
+        status: "ok",
+        payload: {
+            prizeId: prize.id,
+            inventoryId: demoMode ? null : crypto.randomUUID()
+        }
+    };
+}
+
+function handleSpinResult(response, prize, caseItem) {
+    if (response.status !== "ok") {
+        fakeToast("Spin failed");
+        isSpinning = false;
+        return;
+    }
+
+    if (!demoMode) {
+        if (prize.rarity === "Bonus") {
+            stars += prize.value;
+        } else {
+            inventory.unshift({
+                ...prize,
+                inventoryId: response.payload.inventoryId
+            });
+        }
+    }
+
+    updateBalances();
+    renderProfile();
+
+    const homeScreen = document.getElementById("home-screen");
+
+    homeScreen.innerHTML = `
+        <div class="page-shell">
+            <div class="reward-screen">
+                <div class="reward-card">
+                    <div class="reward-art">
+                        ${prize.image ? `<img src="${prize.image}" alt="">` : `<span>${prize.emoji || "🎁"}</span>`}
+                    </div>
+
+                    <h2>${prize.name}</h2>
+                    <p>${prize.rarity} • ⭐ ${prize.value.toLocaleString()}</p>
+
+                    <button class="claim-btn" id="claimBtn">
+                        ${demoMode ? "Back" : "Claim"}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("claimBtn").addEventListener("click", () => {
+        isSpinning = false;
+        renderCasePage(caseItem);
+    });
+}
+
+function getWeightedPrize() {
+    const totalWeight = prizes.reduce((sum, item) => sum + item.weight, 0);
+    let random = Math.random() * totalWeight;
+
+    for (const item of prizes) {
+        random -= item.weight;
+
+        if (random <= 0) {
+            return item;
+        }
+    }
+
+    return prizes[prizes.length - 1];
+}
+
+function toggleDemoMode() {
+    demoMode = !demoMode;
+    fakeToast(demoMode ? "Demo mode enabled" : "Demo mode disabled");
+
+    if (currentCase) {
+        renderCasePage(currentCase);
+    }
 }
 
 function openSettingsModal() {
@@ -281,12 +605,13 @@ function openSettingsModal() {
     modal.innerHTML = `
         <div class="modal-box">
             <button class="modal-close" id="modalCloseBtn">×</button>
+
             <div class="modal-title">Case settings</div>
 
             <div class="settings-row">
                 <div>
                     <h3>Demo mode</h3>
-                    <p>All cases are free, but prizes won't be credited.</p>
+                    <p>All cases are free, but prizes will not be credited.</p>
                 </div>
 
                 <button class="switch ${demoMode ? "active" : ""}" id="demoSwitch">
@@ -307,7 +632,10 @@ function openSettingsModal() {
         demoMode = !demoMode;
         document.getElementById("demoSwitch").classList.toggle("active", demoMode);
         fakeToast(demoMode ? "Demo mode enabled" : "Demo mode disabled");
-        renderCasePage(currentCaseName);
+
+        if (currentCase) {
+            renderCasePage(currentCase);
+        }
     });
 }
 
@@ -322,6 +650,7 @@ function openPrizesModal() {
     modal.innerHTML = `
         <div class="modal-box">
             <button class="modal-close" id="modalCloseBtn">×</button>
+
             <div class="modal-title">Possible prizes</div>
 
             <div class="prize-grid">
@@ -329,7 +658,9 @@ function openPrizesModal() {
                     .map(
                         (item) => `
                             <div class="prize-card">
-                                <div class="prize-icon">${item.icon}</div>
+                                <div class="prize-icon">
+                                    ${item.image ? `<img src="${item.image}" alt="">` : `<span>${item.emoji || "🎁"}</span>`}
+                                </div>
                                 <div class="prize-price">⭐ ${item.value.toLocaleString()}</div>
                                 <div class="prize-name">${item.name}</div>
                             </div>
@@ -357,7 +688,9 @@ function closeModal() {
 }
 
 function renderTasks() {
-    document.getElementById("tasks-screen").innerHTML = `
+    const tasksScreen = document.getElementById("tasks-screen");
+
+    tasksScreen.innerHTML = `
         <div class="page-title">Tasks</div>
 
         <div class="task-list">
@@ -389,14 +722,16 @@ function renderTasks() {
 }
 
 function completeTask(amount) {
-    balance += amount;
-    updateBalance();
-    updateProfile();
-    fakeToast(`+${amount} stars added.`);
+    stars += amount;
+    updateBalances();
+    renderProfile();
+    fakeToast(`+${amount} stars added`);
 }
 
 function renderRaffles() {
-    document.getElementById("raffles-screen").innerHTML = `
+    const rafflesScreen = document.getElementById("raffles-screen");
+
+    rafflesScreen.innerHTML = `
         <div class="page-title">Raffles</div>
 
         <div class="raffle-card">
@@ -409,13 +744,15 @@ function renderRaffles() {
                 <div class="raffle-fill"></div>
             </div>
 
-            <button class="join-btn" onclick="fakeToast('Raffle joined.')">JOIN NOW</button>
+            <button class="join-btn" onclick="fakeToast('Raffle joined')">JOIN NOW</button>
         </div>
     `;
 }
 
 function renderLeaderboard() {
-    document.getElementById("leaderboard-screen").innerHTML = `
+    const leaderboardScreen = document.getElementById("leaderboard-screen");
+
+    leaderboardScreen.innerHTML = `
         <div class="page-title">Leaderboard</div>
 
         <div class="leaderboard-list">
@@ -440,19 +777,20 @@ function renderLeaderboard() {
     `;
 }
 
-function updateProfile() {
+function renderProfile() {
     const profileScreen = document.getElementById("profile-screen");
     const displayName = user.username ? `@${user.username}` : user.first_name;
 
     profileScreen.innerHTML = `
         <div class="profile-card">
             <div class="profile-avatar">${user.first_name.charAt(0)}</div>
+
             <h2>${displayName}</h2>
             <p>ID: ${user.id}</p>
 
             <div class="profile-stats">
                 <div class="stat-box">
-                    <h3>${balance}</h3>
+                    <h3>${stars.toLocaleString()}</h3>
                     <p>Stars</p>
                 </div>
 
@@ -483,7 +821,8 @@ function updateProfile() {
                                   .map(
                                       (item) => `
                                         <div class="inventory-item">
-                                            <span>${item.icon}</span>
+                                            ${item.image ? `<img src="${item.image}" alt="">` : `<span>${item.emoji || "🎁"}</span>`}
+
                                             <div>
                                                 <h4>${item.name}</h4>
                                                 <small>${item.rarity} • ⭐ ${item.value.toLocaleString()}</small>
@@ -499,8 +838,8 @@ function updateProfile() {
     `;
 }
 
-function updateBalance() {
-    document.getElementById("starBalance").innerHTML = `⭐ ${balance.toLocaleString()}`;
+function updateBalances() {
+    document.getElementById("starBalance").innerHTML = `⭐ ${stars.toLocaleString()}`;
     document.getElementById("ticketBalance").innerHTML = `🎟️ ${tickets}`;
 }
 
@@ -517,31 +856,35 @@ function fakeToast(message) {
 
     document.body.appendChild(toast);
 
-    setTimeout(() => toast.classList.add("show"), 50);
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 50);
 
     setTimeout(() => {
         toast.classList.remove("show");
 
-        setTimeout(() => toast.remove(), 300);
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
     }, 2200);
 }
 
 function startLiveScroll() {
-    const liveItems = document.getElementById("liveItems");
+    const liveTrack = document.getElementById("liveTrack");
 
-    if (!liveItems) return;
+    if (!liveTrack) return;
 
     let scrollPos = 0;
 
     setInterval(() => {
         scrollPos += 1;
 
-        liveItems.scrollTo({
+        liveTrack.scrollTo({
             left: scrollPos,
             behavior: "smooth"
         });
 
-        if (scrollPos > liveItems.scrollWidth / 2) {
+        if (scrollPos > liveTrack.scrollWidth / 2) {
             scrollPos = 0;
         }
     }, 35);

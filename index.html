@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Ares Case</title>
     <link rel="stylesheet" href="style.css" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -11,32 +11,18 @@
 <body>
 <div class="app">
     <header class="top-header">
-        <div class="live-wrapper">
-            <span class="live-text">LIVE</span>
-
-            <div class="live-items" id="liveItems">
-                <span>🎂</span>
-                <span>🔥</span>
-                <span>⚔️</span>
-                <span>🧪</span>
-                <span>🎰</span>
-                <span>👑</span>
-                <span>💣</span>
-                <span>🪙</span>
-                <span>🍀</span>
-                <span>🃏</span>
-                <span>💎</span>
-                <span>🎁</span>
-            </div>
+        <div class="balance-row">
+            <button class="balance-card stars" id="starBalance">⭐ 35</button>
+            <button class="balance-card tickets" id="ticketBalance">🎟️ 2</button>
         </div>
 
-        <div class="balance-area">
-            <div class="balance-pill" id="starBalance">⭐ 35</div>
-            <div class="balance-pill blue" id="ticketBalance">🎟️ 2</div>
-        </div>
+        <section class="live-section">
+            <h1>LIVE</h1>
+            <div class="live-track" id="liveTrack"></div>
+        </section>
     </header>
 
-    <main class="screens">
+    <main class="screen-container">
         <section class="screen active" id="home-screen"></section>
         <section class="screen" id="raffles-screen"></section>
         <section class="screen" id="tasks-screen"></section>
